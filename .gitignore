@@ -1,0 +1,70 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.env
+*.sqlite3
+*.db
+coverage.xml
+htmlcov/
+.local/
+
+# Local configuration and secrets. Only the documented placeholder is public.
+.env.*
+!.env.example
+.envrc
+.pgpass
+pgpass.conf
+credentials.*
+secrets.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Database/runtime state must never enter the audit source history.
+pgdata/
+pgdata_*/
+postgresql-data/
+postmaster.pid
+postmaster.opts
+*.sqlite3-*
+*.db-journal
+*.db-wal
+*.db-shm
+*.log
+
+# Other generated environments, caches and package exports.
+venv/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.coverage
+build/
+dist/
+audit_exports/
+*.zip
+*.bundle
+
+# Private study/case material and local release staging; existing tracked history
+# still requires review (ignore rules never remove tracked files).
+private/
+participants/
+participant_data/
+uat_private/
+case_organisation_private/
+consent_forms/
+release_staging/
+*.dump
+*.backup
+*.sql.gz
+
+# Editor/OS files and local packaging output.
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+node_modules/
+audit_packages/
