@@ -6,6 +6,6 @@ The application source corresponds to candidate `dbdedb8ce5cea8979cf296108c8658d
 
 Human usability testing is underway. No participant outcomes, final whole-suite regression, final independent review or frozen FYP release are claimed. Current evidence is summarized in [Testing](testing/README.md), with [limitations](testing/LIMITATIONS.md).
 
-Before hosting privately, review the screenshots, student contribution wording and rights to share source/assets. Before making the repository public, complete the final usability, regression, independent-review and freeze decisions, refresh evidence/status, confirm licensing/attributions and perform a final privacy review. A pattern scan cannot guarantee the absence of every secret or private detail.
+The project owner approved private hosting of the reviewed source, five fictional screenshots and contribution wording on 15 November 2026. This approval does not authorize public release. Before making the repository public, complete the final usability, regression, independent-review and freeze decisions, refresh evidence/status, confirm licensing/attributions and perform a final privacy review. A pattern scan cannot guarantee the absence of every secret or private detail.
 
 Use private environment variables or ignored `.env` files for local credentials. Never add participant records, case correspondence, local databases/dumps, runtime logs, tokens or the original `.git` directory. Fictional fixture credentials are intentionally public development examples.

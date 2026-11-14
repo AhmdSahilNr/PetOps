@@ -2,7 +2,7 @@
 
 Five images were selected from the existing 0008 candidate walkthrough. They show fictional demonstration accounts and records, not participants or real service delivery. The original pixels are retained; none was generated or retouched for this repository. Dates, counts and example records reflect capture time.
 
-The gallery is proposed for the private repository. Student confirmation of sharing rights and the intended presentation is still required before hosting. Visual inspection found no visible private contact details, browser profile chrome or local machine paths; that is a bounded review, not an absolute privacy guarantee.
+The project owner approved this gallery and its sharing rights for private repository hosting on 15 November 2026. Public release remains a separate decision. Visual inspection found no visible private contact details, browser profile chrome or local machine paths; that is a bounded review, not an absolute privacy guarantee.
 
 ## Customer booking
 
