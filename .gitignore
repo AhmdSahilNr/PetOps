@@ -68,3 +68,13 @@ Desktop.ini
 .vscode/
 node_modules/
 audit_packages/
+
+# Private academic/control material is never part of the public portfolio.
+academic_recovery/
+audit_packages/
+docs/evidence/
+docs/usability/
+*.pdf
+*.docx
+*.xlsx
+*.pptx

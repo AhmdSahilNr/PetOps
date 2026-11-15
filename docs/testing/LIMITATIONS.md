@@ -1,16 +1,15 @@
 # Known limitations
 
-- The recorded 82-test result is historical targeted PostgreSQL verification, not a final full regression. Test files also contain cases outside that selection.
-- Human usability testing is underway; participant results and final acceptance are not included.
-- Fresh-machine dependency installation and platforms other than the recorded local environment remain unverified. The existing environment used Python 3.12.14 and PostgreSQL 18.6.
-- The developer owner/database recipe is not a production least-privilege deployment. Runtime grants, deployment configuration and production operations need separate verification.
-- The application and Alembic configuration retain legacy placeholder database URLs. Always supply an explicit private environment URL; do not reuse the defaults for retained data.
-- Application pytest fixtures clear their selected database. The loopback/`_test` check does not distinguish a human-testing database that also happens to have that suffix. Select a newly created, separate test database deliberately.
-- Legacy availability structures and some bounded compatibility APIs remain. General availability records no longer control Staff eligibility.
-- Migrated old responsibility records preserve only the last saved period; absent historical actor/name information stays unknown. No earlier handover is reconstructed.
-- Responsibility periods are planned accountability, not attendance or continuous-care evidence. Boarding handover is bounded to now/future within the planned stay.
-- Edit preflight checks are not a complete atomic conditional-edit protocol.
-- Screenshot counts/dates reflect fictional data at capture time, not current operating totals or a usability result.
-- A historical dependency warning concerns FastAPI/Starlette TestClient's use of `httpx`. Dependencies were not upgraded during active usability testing.
-
-These are documented limits, not new requirements or an independent acceptance verdict.
+- Frozen academic baseline with394/394 regression and C03 PASS WITH CONDITIONS; not production readiness/security certification or production least-privilege deployment proof.
+- No fresh-machine installation/deployment or comprehensive recovery certification; local owner setup is for isolated development.
+- No full accessibility, cross-browser or zoom certification. Qualitative human observations do not establish measured improvement/general usability or professional expertise for every explored role.
+- Explicit private database settings are required. Frozen application/Alembic source retain legacy development placeholders; never treat those as usable production credentials.
+- Application tests clear their selected DB. Exact verified disposable identity, not a name suffix, is required.
+- External Staff absence/leave is not an implemented current MUST; generic availability windows are retired eligibility inputs. Occupied-unit transfer is outside scope. Generic BR-013 exceptional active-state override remains deliberately unresolved.
+- Legacy responsibility facts keep only information originally present; absent historical actors or earlier handovers are not reconstructed.
+- Responsibility is planned accountability, not attendance, hours/performance or continuous care. Handover is bounded to now/future within the planned stay.
+- Edit preflight is not a universal atomic conditional-edit protocol.
+- Seeded dates/counts and accelerated care walkthroughs are fictional; trend events occur at actual seed time. IDs/hashes/timestamps vary even when semantic story repeats.
+- Retained Starlette/httpx test-client warning was not addressed by an unrelated dependency upgrade.
+- C03 did not independently rerun PostgreSQL or reverify the earlier populated0007→0008 upgrade from its minimal pack; earlier upgrade evidence remains private.
+- MIT is selected for included project material; public visibility approval remains separate from technical freeze and private push. This curated repository omits private raw research/audit/control evidence.

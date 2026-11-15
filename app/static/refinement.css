@@ -1,0 +1,161 @@
+/* Controlled presentation layer. Existing routes, forms and operational rules remain authoritative. */
+:root {
+  color-scheme: light;
+  --canvas:#faf7f1; --surface:#fff; --raised:#f7f1e8; --chrome:#fffdf9;
+  --ink:#2c2520; --muted:#625a53; --quiet:#625a53; --line:#ddd3c7;
+  --control:#81776f; --interactive:#eee7dd; --accent:#a83b12;
+  --accent-hover:#812b0c; --on-accent:#fff; --tint:#fff0df; --focus:#155e63;
+  --success:#205b3c; --success-bg:#e5f2e9; --warning:#784505; --warning-bg:#fff0c7;
+  --info:#155e63; --info-bg:#e2f1f0; --error:#982f2b; --error-bg:#fbe5e2;
+  color:var(--ink); background:var(--canvas);
+}
+body {font-size:17px;line-height:1.55;color:var(--ink);background:var(--canvas)}
+body[data-role="customer"] {font-size:18px}
+body[data-role="admin"] {font-size:16px}
+h1,.customer-heading h1 {font-size:32px;line-height:1.2;letter-spacing:-.025em}
+h2 {font-size:23px;line-height:1.3} h3 {font-size:19px;line-height:1.35}
+p {line-height:1.55}
+.meta,.notice,.eyebrow,.shell-caption,.booking-draft-note,.booking-steps,
+.booking-summary dt,.record-summary dt,.profile-summary dt,.product-disclosure>p,
+.product-disclosure>summary,.staff-lifecycle,.filter-summary {font-size:16px;color:var(--muted)}
+.eyebrow {font-weight:650;letter-spacing:.04em}
+label,legend {font-size:16px;font-weight:600}
+button,input,select,textarea {font:inherit;font-size:16px;min-height:44px;border-radius:10px}
+button {padding:10px 18px;font-weight:650;line-height:1.35;border:1.5px solid var(--accent)}
+input,select,textarea {padding:10px 12px;background:var(--surface);color:var(--ink);border:1.5px solid var(--control);max-width:100%}
+input:hover,select:hover,textarea:hover {border-color:var(--ink)}
+input::placeholder,textarea::placeholder {color:var(--muted);opacity:1}
+input[type="radio"],input[type="checkbox"] {min-height:24px;width:24px;height:24px;flex:none;accent-color:var(--accent)}
+.booking-choice input[type="radio"] {width:24px;height:24px;min-height:24px;padding:0}
+button.secondary {background:var(--surface);color:var(--ink);border-color:var(--control)}
+button.secondary:hover {background:var(--raised);border-color:var(--ink);color:var(--ink)}
+button:disabled {background:var(--interactive);border-color:var(--control);color:var(--muted);cursor:not-allowed}
+:focus-visible {outline:3px solid var(--focus);outline-offset:3px}
+a {color:var(--accent-hover);text-underline-offset:3px}
+.row-actions,.record-actions,.booking-actions,.staff-actions {gap:12px}
+.field-error,#message,.booking-feedback,.admin-edit .booking-feedback {font-size:16px;line-height:1.5}
+#message:not(:empty) {padding:12px 16px;border-radius:10px}
+.field-error,.booking-feedback,#message.error {color:var(--error);background:var(--error-bg)}
+
+/* Familiar labeled navigation and generous persistent targets. */
+header {background:var(--chrome);color:var(--ink);border-color:var(--line)}
+header strong {font-size:25px;letter-spacing:-.02em}
+.brand-mark {color:var(--ink)}
+.brand-mark path:first-child {stroke:currentColor}
+.shell-nav {background:var(--chrome);border-color:var(--line)}
+.shell-role {font-size:15px;color:var(--muted);font-weight:650}
+.shell-nav button,.shell-nav button.secondary {display:flex;align-items:center;gap:12px;min-height:48px;font-size:16px;text-align:left;background:transparent;color:var(--muted);border-color:transparent;border-radius:10px;padding:11px 14px}
+.shell-nav button:hover,.shell-nav button.secondary:hover {background:var(--raised);color:var(--ink);border-color:transparent}
+.shell-nav button[aria-current="page"] {color:var(--accent-hover);background:var(--tint);border-left:4px solid var(--accent);font-weight:750}
+.shell-scrim {background:#2c252066}
+#identity,#identity summary,.authenticated #identity {font-size:16px;color:var(--muted)}
+#identity summary {min-height:44px;display:flex;align-items:center;cursor:pointer}
+#identity details p {background:var(--surface);color:var(--ink);overflow-wrap:anywhere}
+#logout {min-height:44px;background:var(--surface);color:var(--ink);border-color:var(--control)}
+#logout:hover {background:var(--raised)}
+.refinement-icon {width:22px;height:22px;flex:none;vertical-align:middle;display:inline-block;stroke-width:1.9}
+.service-heading {display:flex;align-items:center;gap:10px;color:var(--info)}
+
+/* One contextual Home action. Current booking and pet information stay in place. */
+.home-booking-prompt {display:flex;justify-content:space-between;align-items:center;gap:24px;padding:26px 28px;margin:0 0 24px;border:1px solid #d8bca3;border-left:5px solid var(--accent);border-radius:16px;background:var(--tint)}
+.home-booking-prompt h2 {margin:0 0 8px;font-size:27px;letter-spacing:-.02em;color:var(--ink)}
+.home-booking-prompt p {margin:0 0 14px;color:var(--muted);font-size:18px}
+.home-service-cues {display:flex;flex-wrap:wrap;gap:10px 18px}
+.home-service-cue {display:inline-flex;align-items:center;gap:8px;font-size:16px;font-weight:650;color:var(--info)}
+.home-booking-prompt .primary-cta {display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:14px 24px;font-size:18px;white-space:nowrap}
+.customer-lead {padding:24px;background:var(--surface);border-color:var(--line);border-radius:14px}
+.customer-lead h2 {font-size:27px}.customer-lead h3 {font-size:21px}
+.customer-home-grid {gap:24px}
+.customer-home-grid>section {min-width:0}
+.pet-avatar {background:#f5e5d4;color:#78340f;font-size:19px}
+.profile-summary,.pet-row {background:var(--surface);border-color:var(--line)}
+.record-pet h2 {font-size:21px}
+
+/* Shared readable forms, selections and semantic labels; colour is supplementary. */
+form,article,.card,.workspace-panel,.record-empty,.booking-review,.booking-success,
+.booking-selection,.record-change,.event-card,.admin-list-row,.staff-work-row {background:var(--surface);border-color:var(--line)}
+.booking-flow fieldset {border-color:var(--line);padding:20px}
+.booking-flow legend {font-size:23px;color:var(--ink)}
+.booking-choice.service-choice,.booking-single {background:var(--surface);color:var(--ink);border-color:var(--control)}
+.service-choice:hover {background:var(--raised);border-color:var(--accent)}
+.service-choice strong {font-size:20px}.service-choice .meta {font-size:16px;color:var(--muted)}
+.service-choice.selected,.service-choice:has(input:checked),.booking-choice:has(input:checked),.prep-choice:has(input:checked) {background:var(--tint);border:2px solid var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.booking-steps {gap:14px}.booking-steps [aria-current="step"] {font-weight:750;color:var(--accent-hover)}
+.booking-steps [aria-current="step"] .step-number {background:var(--accent);color:var(--on-accent)}
+button[aria-pressed="true"] {background:var(--tint)!important;color:var(--accent-hover)!important;border-color:var(--accent)!important;font-weight:750;box-shadow:inset 0 -2px var(--accent)}
+.status-badge {font-size:15px;line-height:1.4;font-weight:650;padding:5px 10px;background:#ece8e3;color:#51463e;border:1px solid #81776f}
+.status-badge.status-submitted,.status-badge.waiting {background:var(--warning-bg);color:var(--warning);border-color:#9a6b21}
+.status-badge.status-confirmed {background:var(--info-bg);color:var(--info);border-color:#478086}
+.status-badge.status-completed,.status-badge.status-checked_out,.status-badge.positive:not(.status-confirmed) {background:var(--success-bg);color:var(--success);border-color:#548268}
+.status-badge.status-in_progress,.status-badge.status-staying,.status-badge.status-checked_in {background:var(--info-bg);color:var(--info);border-color:#478086}
+.status-badge.status-rejected,.status-badge.danger {background:var(--error-bg);color:var(--error);border-color:#ad5951}
+.status-badge.status-cancelled {background:#ece8e3;color:#51463e;border-color:var(--control)}
+.record-next,.prep-readiness,.booking-explanation,.action-confirm {background:var(--raised);color:var(--ink);border-color:var(--line)}
+.record-summary,.booking-summary,.profile-summary {line-height:1.6}
+.record-summary dd,.booking-summary dd {min-width:0;overflow-wrap:anywhere}
+.event-schedule,.group-heading,.chart-row strong {color:var(--ink);font-size:16px}
+.record-timeline {border-color:var(--control)}
+.record-timeline li {background:var(--surface);border-color:var(--line)}
+.record-timeline li::marker {color:var(--info)}
+.filter-toolbar {background:var(--surface);border-color:var(--control)}
+.product-disclosure>summary {min-height:44px;padding:10px 0;color:var(--muted)}
+
+/* Staff retains its three destinations and existing queue logic. */
+.staff-work-row {padding:22px;border-radius:14px;gap:22px;align-items:center;border-left:4px solid var(--info)}
+.staff-work-row.service-boarding {border-left-color:var(--accent)}
+.staff-work-row h2 {font-size:23px;margin-bottom:4px}
+.staff-work-identity>p {margin:6px 0}
+.staff-service-kind {display:flex;align-items:center;gap:8px;color:var(--info);font-size:16px;font-weight:650}
+.staff-work-dates>p:first-child {font-size:18px;font-weight:650;color:var(--ink);margin-bottom:6px}
+.staff-work-dates .meta {font-size:16px}
+.staff-work-row>button {min-height:46px;white-space:normal}
+.staff-stay-lead {background:var(--surface)}
+
+/* Dense Admin information remains available, with lighter grouping and legible numbers. */
+.metric-tile {background:var(--surface);border-color:var(--line);border-top:3px solid var(--info);border-radius:12px}
+.metric-label {font-size:16px;color:var(--muted)}
+.metric-value {color:var(--ink);font-size:34px}
+.metric-tile button {font-size:16px;min-height:44px}
+.metric-tile.attention-metric {border-top-color:var(--accent)}
+.metric-tile.attention-metric .metric-value {color:var(--accent-hover)}
+.metric-tile:has([data-metric^="completed"]) {border-top-color:var(--success)}
+.attention-list,.overview-attention {background:var(--surface);border-color:var(--line)}
+.task-row {gap:16px}
+.admin-list-row h2 {font-size:20px}
+.admin-row {background:transparent}
+.overview-workload-row h3 {font-size:18px}
+table {font-size:16px} th {color:var(--muted);background:var(--raised)}
+.chart-row progress {accent-color:var(--info)}
+footer {font-size:15px;color:var(--muted);border-color:var(--line)}
+
+@media(max-width:1023px) {
+  .shell-nav {background:var(--chrome)}
+  .home-booking-prompt {padding:22px;gap:18px}
+}
+@media(max-width:600px) {
+  header {padding:14px 16px}
+  .authenticated header {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}
+  .authenticated header strong {grid-column:1;grid-row:1;font-size:24px}
+  .authenticated .shell-menu {grid-column:2;grid-row:1;min-height:44px}
+  .authenticated #identity {grid-column:1;grid-row:2;min-width:0}
+  .authenticated #logout {grid-column:2;grid-row:2}
+  #identity summary {font-size:16px;overflow-wrap:anywhere}
+  h1,.customer-heading h1 {font-size:29px}
+  h2 {font-size:23px}
+  .home-booking-prompt {display:block;padding:20px;margin-bottom:20px}
+  .home-booking-prompt h2 {font-size:25px}
+  .home-booking-prompt .primary-cta {width:100%;margin-top:20px;white-space:normal}
+  .customer-lead {padding:20px}
+  .booking-flow fieldset {padding:16px}
+  .booking-steps {font-size:16px;gap:12px;flex-wrap:wrap}
+  .booking-summary,.record-summary {grid-template-columns:1fr}
+  .record-filters {gap:10px}
+  .staff-work-row {gap:14px;padding:18px}
+  .staff-work-row>button {width:100%}
+  .metric-tile {padding:14px}.metric-value {font-size:30px}
+  .metric-label {font-size:15px}.metric-tile button {padding:9px 12px}
+  .workspace-panel,.event-card {padding:18px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .shell-nav,button {transition:none}
+}

@@ -1,11 +1,9 @@
-# Repository and release status
+# Version and release boundaries
 
-This is a curated PetOps project snapshot prepared for private recruiter/developer review. It starts a new history with a truthful initial commit. The original development repository and historical technical/academic evidence remain preserved locally; they are not imported into this history.
+Technical FYP baseline frozen by the controller as recorded in the15November2026 closure authorization. Application e174d81ed2b170928d070c12dd59adba57bba6a3; tested50b1935216f4d569bf56aeec938c84be47ad9fb0; documentation f86bc9cae069db5e2932da5188afaf6b210f1a77; migration0008; combined fingerprint464eb3808101c7d3a3ee302bd63099b50c8d74ad32cbe4b294aa7fbf5f1be932. [Portable file manifest](testing/source-manifest.json).
 
-The application source corresponds to candidate `dbdedb8ce5cea8979cf296108c8658dbb1c032a2`, migration `0008`. The [source manifest](testing/source-manifest.json) records the 74 candidate source files used for its fingerprint. Portfolio documentation and local packaging tools are separate additions.
+Full394/394 regression; qualitative human evaluation complete; independent C03 PASS WITH CONDITIONS. Git/package/addendum/claim-bound conditions later verified satisfied. No product-code rework. Technical freeze does not certify production or authorize public hosting by itself.
 
-Human usability testing is underway. No participant outcomes, final whole-suite regression, final independent review or frozen FYP release are claimed. Current evidence is summarized in [Testing](testing/README.md), with [limitations](testing/LIMITATIONS.md).
+This curated repository has separate truthful history. Earlier private commits remain historical; current source and tests match the frozen runtime/test identities above. Original FYP evidence stays outside this repository. Old commits are not rewritten to make earlier results appear current.
 
-The project owner approved private hosting of the reviewed source, five fictional screenshots and contribution wording on 15 November 2026. This approval does not authorize public release. Before making the repository public, complete the final usability, regression, independent-review and freeze decisions, refresh evidence/status, confirm licensing/attributions and perform a final privacy review. A pattern scan cannot guarantee the absence of every secret or private detail.
-
-Use private environment variables or ignored `.env` files for local credentials. Never add participant records, case correspondence, local databases/dumps, runtime logs, tokens or the original `.git` directory. Fictional fixture credentials are intentionally public development examples.
+The owner selected MIT for project code/documentation and approved committing/pushing the reviewed update while the repository remains PRIVATE. [LICENSE](../LICENSE) and [licensing scope](../LICENSING.md) preserve the boundary for third-party packages and excluded private material. Public visibility is not authorized by that private push. Internal audit ZIPs, participant records and correspondence are intentionally excluded. See [limits](testing/LIMITATIONS.md) and [setup](developer/SETUP.md).

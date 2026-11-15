@@ -30,6 +30,6 @@ The first row summarizes the documented AS-IS Boarding findings. The second desc
 | A profile/pet change must not expose another owner's data or erase history | Scoped account APIs and pet archiving | `test_pet_archive_keeps_history_and_ownership` and `test_account_fields_remain_scoped` in [test_product_simplification.py](../../tests/test_product_simplification.py) |
 | Operational changes need consistent history | Transactional events and PostgreSQL triggers | `test_integrated_customer_to_completion_notifications_and_admin_review` in [test_final_hardening.py](../../tests/test_final_hardening.py) |
 
-This is a portfolio traceability sample, not a replacement for the full approved FYP requirements matrix. A test's presence is not a claim that it ran in the latest selection. The [testing record](../testing/README.md) lists exactly what the historical targeted run included.
+This is a portfolio traceability sample, not a replacement for the full approved FYP requirements matrix. The final394-case collection includes the cited current tests. The [testing record](../testing/README.md) distinguishes execution results from test presence and independent review.
 
-Project work covers analysis, workflow/role design, relational modelling, API and interface implementation, and verification. This repository presents the artifacts and decisions for technical review. Human acceptance remains subject to actual participant evidence.
+Project work covers analysis, workflow/role design, relational modelling, API and interface implementation, and verification. This repository presents the artifacts and decisions for technical review. Human evaluation is complete as bounded qualitative evidence; it does not supply numerical improvement or general-market validation.

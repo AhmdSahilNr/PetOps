@@ -1,5 +1,5 @@
 """Approved operational measures with explicit date bases; no financial KPIs."""
-from datetime import date
+from datetime import date,timedelta
 from fastapi import APIRouter,Depends
 from sqlalchemy import func,select,text
 from sqlalchemy.orm import Session
@@ -14,6 +14,44 @@ from .services import business_today,utc_iso
 from .views import booking_view
 
 router=APIRouter(prefix='/admin',tags=['Admin operational dashboard'])
+
+
+def insight_measures(db,start,end,lo,hi,now):
+    """Read existing facts only; decision events are not unique bookings."""
+    decisions={BookingStatus.CONFIRMED:0,BookingStatus.REJECTED:0}
+    for status,count in db.execute(select(BookingEvent.new_status,func.count()).where(
+        BookingEvent.event_type=='STATUS_CHANGED',BookingEvent.new_status.in_(decisions),
+        BookingEvent.created_at>=lo,BookingEvent.created_at<hi).group_by(BookingEvent.new_status)):
+        decisions[status]=count
+    confirmed,rejected=decisions[BookingStatus.CONFIRMED],decisions[BookingStatus.REJECTED]
+    denominator=confirmed+rejected
+    bucket_size='week' if (end-start).days<93 else 'month'
+    bucket=func.date_trunc(bucket_size,func.timezone('Asia/Kuala_Lumpur',Booking.created_at))
+    buckets={}
+    for period,kind,count in db.execute(select(bucket,Booking.booking_type,func.count()).where(
+        Booking.created_at>=lo,Booking.created_at<hi).group_by(bucket,Booking.booking_type).order_by(bucket)):
+        key=period.date().isoformat()
+        row=buckets.setdefault(key,{'period_start':key,'GROOMING':0,'BOARDING':0,'total':0})
+        row[kind.value]=count;row['total']+=count
+    today=business_today();last=today+timedelta(days=6)
+    _,near_end=period_bounds(today,last)
+    near={'from_date':today.isoformat(),'to_date':last.isoformat(),
+        'grooming_appointments':db.scalar(select(func.count()).select_from(Booking).where(
+            Booking.booking_type==ServiceType.GROOMING,Booking.status==BookingStatus.CONFIRMED,
+            Booking.grooming_start>=now,Booking.grooming_start<near_end)),
+        'boarding_arrivals':db.scalar(select(func.count()).select_from(Booking).where(
+            Booking.booking_type==ServiceType.BOARDING,Booking.status==BookingStatus.CONFIRMED,
+            Booking.boarding_start>=today,Booking.boarding_start<=last)),
+        'boarding_departures':db.scalar(select(func.count()).select_from(Booking).where(
+            Booking.booking_type==ServiceType.BOARDING,
+            Booking.status.in_([BookingStatus.CONFIRMED,BookingStatus.CHECKED_IN,BookingStatus.STAYING]),
+            Booking.boarding_end>=today,Booking.boarding_end<=last)),
+        'active_boarding_stays':db.scalar(select(func.count()).select_from(BoardingStay).where(BoardingStay.checked_out_at.is_(None))),
+        'requests_needing_review':db.scalar(select(func.count()).select_from(Booking).where(Booking.status==BookingStatus.SUBMITTED))}
+    return {'confirmation_decisions':{'confirmed':confirmed,'rejected':rejected,'decided':denominator,
+            'confirmation_rate_percent':round(confirmed*100/denominator,2) if denominator else None},
+        'booking_volume':{'bucket_size':bucket_size,'buckets':list(buckets.values()),'zero_buckets_omitted':True},
+        'next_seven_days':near}
 
 
 def report(db,start,end):
@@ -50,7 +88,8 @@ def report(db,start,end):
         Booking.boarding_end>=today,Booking.boarding_end>=start,Booking.boarding_end<=end)
     arrivals=db.scalars(arrivals_q.order_by(Booking.boarding_start,Booking.id).limit(200)).all()
     departures=db.scalars(departures_q.order_by(Booking.boarding_end,Booking.id).limit(200)).all()
-    return {'period':{'from_date':start.isoformat(),'to_date':end.isoformat(),'timezone':'Asia/Kuala_Lumpur','utc_start':utc_iso(lo),'utc_end_exclusive':utc_iso(hi)},
+    return {**insight_measures(db,start,end,lo,hi,now),
+        'period':{'from_date':start.isoformat(),'to_date':end.isoformat(),'timezone':'Asia/Kuala_Lumpur','utc_start':utc_iso(lo),'utc_end_exclusive':utc_iso(hi)},
         'total_bookings':sum(statuses.values()),'bookings_by_status':statuses,'bookings_by_type':types,
         'completed_services_by_type':completed,'booking_change_events':changes,'staff_workload':workload,
         'boarding_current':{'as_of':utc_iso(now),'configured_active_capacity':capacity,'physically_occupied':occupied,
@@ -63,6 +102,9 @@ def report(db,start,end):
             'workload':'Current unreleased responsibilities overlapping selected period; distinct bookings, not hours or productivity. Legacy missing periods are separate.',
             'boarding_current':'Current physical occupancy and current configured active capacity; independent of selected period and includes overdue open stays.',
             'arrivals_departures':'Upcoming planned stay dates inside selected inclusive dates; cancelled/rejected/completed work excluded.',
+            'confirmation_decisions':'Confirmed STATUS_CHANGED decisions / confirmed plus rejected STATUS_CHANGED decisions at event time in selected period; reconfirmation counts as another decision, later cancellation does not erase it. No decisions gives null.',
+            'booking_volume':'Bookings created in selected MYT period, grouped by MYT Monday weeks for up to93 inclusive days, otherwise calendar months. Only non-empty buckets shown.',
+            'next_seven_days':'Independent of reporting period: from now to the end of the sixth following MYT date. Confirmed future Grooming, planned confirmed arrivals, confirmed/open departures; open physical stays and pending review are current snapshots.',
             'omissions':'No revenue, profitability, cancellation-reason analysis or invented historical capacity utilisation.'}}
 
 

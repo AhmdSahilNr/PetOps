@@ -1,97 +1,86 @@
 # PetOps
 
-PetOps is a web-based Grooming and Boarding booking and management system developed as an Information Systems Final Year Project. It connects Customer bookings, Staff responsibilities and Admin operations in one application, with a PostgreSQL record of service activity and changes.
+An **Information Systems / Business & Systems Analysis** Final Year Project supported by a working Grooming and Boarding booking-management system, relational database design, access controls, validation and operational reporting.
 
-| User | Main workflow |
+**Status:** technical baseline frozen for FYP closure. Final PostgreSQL-backed regression: **394/394 passed**. Independent C03 audit: **PASS WITH CONDITIONS**, with no blocking implementation defect or current MUST gap; subsequent control verification satisfied the freeze conditions. Human usability evidence is qualitative. This is an academic project, not production/security/accessibility certification.
+
+[3–5 minute demo](demo/README.md) · [Local setup](docs/developer/SETUP.md) · [Analysis](docs/analysis/README.md) · [Database](docs/database/README.md) · [Verification](docs/testing/README.md)
+
+## Business problem and solution
+
+The documented existing Boarding process combined manual reservation/capacity checks with digital records and general allocation remarks. PetOps connects structured requests, resources, responsibility and service history. This is a bounded process improvement, not a claim the organisation previously had no software or that all operations are automated. Private organisation and stakeholder material is excluded.
+
+## Roles and core workflows
+
+| Role | Responsibilities |
 |---|---|
-| Customer | Pet → service → availability → request → confirmation or permitted change → history |
-| Staff | Assigned work → Grooming fulfilment or Boarding care → completion |
-| Admin | Review requests → allocate resources and assign Staff → confirm or reject → manage operations → review history and insights |
+| Customer | Manage own profile/pets, request a service, follow own bookings, permitted changes and history |
+| Staff | Inspect assigned work, perform authorized Grooming/Boarding actions and record care |
+| Admin | Prepare resources, confirm/reject, manage active operations/catalogue/Staff and review history/Insights |
 
-**Status:** Core system implementation is complete. Human usability testing is underway. Final regression verification and independent review remain pending before the FYP release is frozen.
-
-[Run locally](docs/developer/SETUP.md) · [Analysis and traceability](docs/analysis/README.md) · [Architecture](docs/architecture/README.md) · [Database](docs/database/README.md) · [Testing evidence](docs/testing/README.md)
-
-## Problem and solution
-
-Manual reservation records, accommodation checks and allocation notes make it difficult to connect a booking to available capacity, the responsible person and its service history. PetOps represents these as linked records with role-specific actions, scheduling checks and recorded status changes. The analysis summary uses no private interview transcripts or case-organisation identifiers.
-
-## Screenshots
-
-Fictional demonstration data from the implemented candidate; these images are not participant results or evidence of real service delivery.
-
-**Customer service selection**
-
-![Customer choosing a pet and Grooming or Boarding service](assets/screenshots/customer-booking.jpg)
-
-**Admin operational overview**
-
-![Admin overview showing review work and current operational counts](assets/screenshots/admin-overview.jpg)
-
-[View the five-image gallery, including Staff work, Boarding responsibility history and Insights](assets/README.md).
+Grooming: request → Staff assignment → confirmation → start → complete. Boarding: request → accommodation allocation, optional Staff → confirmation → Check In → Staying → Check Out → Completed. Pre-work rescheduling requires resource preparation/reconfirmation. [Role and workflow boundaries](docs/workflows/README.md).
 
 ## Key features
 
-- Customer accounts, pet profiles and archiving, service selection, bookings, permitted rescheduling and cancellation.
-- Grooming appointments with saved service durations and conflict-checked Staff assignment.
-- Boarding capacity and accommodation allocation, Check In, stay notes and Check Out.
-- Booking-derived Staff responsibility periods and attributed Boarding handover history.
-- Role-scoped notifications, Admin service/Staff configuration, operational overview and period-based insights.
+- Owned pet profiles/archive and service requests with validation.
+- Duration-aware Grooming assignments; Boarding capacity and physical occupancy checks.
+- Booking-derived Staff responsibility, conflict prevention and attributed mid-stay handover history.
+- Role-scoped notifications, retained events, service/Staff configuration and operational Insights.
 
-See [workflows and role boundaries](docs/workflows/README.md) for the operating rules.
+## Business and system analysis
 
-## Business & Systems Analysis
+[AS-IS/TO-BE and sample traceability](docs/analysis/README.md) connect requirements, business rules, role responsibilities, design decisions, implementation and actual tests. Examples include duration snapshots, separating physical allocation from responsibility, and preserving the original plan across handover. The portfolio summarizes analysis without exposing private interview transcripts or claiming new stakeholder validation.
 
-Project work spans stakeholder-informed requirements, AS-IS/TO-BE process analysis, functional requirements, business rules, role responsibilities, relational data modelling, implementation and verification. The [sanitized analysis and traceability](docs/analysis/README.md) connects these decisions to source modules and test cases.
+## Technology stack
 
-Examples include preserving a service-duration snapshot when configuration changes, separating physical Boarding capacity from Staff responsibility, and retaining the original responsibility period when a handover takes effect. Private stakeholder evidence and academic correspondence are excluded from this repository.
+Python · FastAPI · PostgreSQL · SQLAlchemy · Alembic · HTML · CSS · JavaScript · REST-style HTTP/JSON · Git/GitHub. Pytest and built-in-only Node harnesses support testing. [Pinned dependencies](requirements.lock.txt); no frontend package build is required.
 
-## Technology
-
-Python · FastAPI · PostgreSQL · SQLAlchemy · Alembic · HTML/CSS/JavaScript · REST-style HTTP APIs · Git. Pytest covers application checks; Node runs the built-in JavaScript harnesses. Dependencies are pinned in [requirements.lock.txt](requirements.lock.txt).
-
-## Security & data integrity
-
-Passwords use salted scrypt hashes. Server-side session authentication, role checks and ownership checks protect API actions. Request validation is backed by PostgreSQL foreign keys, check/exclusion constraints and workflow/history triggers. Booking events and linked fulfilment records preserve supported changes and attribution.
-
-These controls are implemented and tested within the documented scope; they are not a production security certification. See [architecture](docs/architecture/README.md), [database rules](docs/database/README.md) and [known limitations](docs/testing/LIMITATIONS.md).
-
-## Architecture
+## Architecture and database
 
 ```mermaid
 flowchart LR
-    Browser[Browser: HTML / CSS / JavaScript] -->|HTTP / JSON| API[FastAPI: authentication and business rules]
-    API --> ORM[SQLAlchemy]
-    ORM --> DB[(PostgreSQL)]
-    Migrations[Alembic migrations] --> DB
+    Browser[HTML / CSS / JavaScript] -->|HTTP / JSON| API[FastAPI: sessions, roles, ownership and workflows]
+    API --> ORM[SQLAlchemy transactions]
+    ORM --> DB[(PostgreSQL constraints and history)]
+    Alembic[Alembic migrations 0001–0008] --> DB
 ```
 
-The [architecture map](docs/architecture/README.md) explains module responsibilities; the [simplified ERD](docs/database/README.md) explains the main relationships.
+[Architecture map](docs/architecture/README.md) · [Simplified ERD and database decisions](docs/database/README.md). `StaffResponsibility` preserves planned periods and attribution; it does not represent attendance or leave. KPI creation cohorts, decision events, completions and current occupancy use distinct time bases. [Insights definitions](docs/analysis/KPI_SEMANTICS.md).
 
-## Testing
+## Security and ownership
 
-The repository includes functional, authorization/RBAC, data-integrity, concurrency, workflow and JavaScript response-order checks. A recorded targeted PostgreSQL run for this application candidate passed **82 tests with one warning**. This was a selected run, not a final full regression.
+Salted scrypt password hashes, server-side session records, server-enforced roles/ownership, strict input validation and PostgreSQL constraints/triggers protect the approved workflows. Hiding a button is insufficient authorization. These implemented controls do not establish production security or least-privilege deployment certification.
 
-Human usability testing is underway; participant outcomes and final acceptance are not claimed here. See the [testing record and safe execution instructions](docs/testing/README.md). Application fixtures clear their selected database and must only run against a separate disposable test database.
+## Testing and verification
 
-## Running locally
+The final suite collected and ran **394 cases: 394 passed, 0 failed/errors/skipped, exit 0**, with one retained dependency warning, in 898.40 seconds. The initial full run had two obsolete test-setup failures; correction of those setups preserved denial/history assertions, passed an 8-case retest, then the same full suite passed. **No product source changed in that correction cycle.** The total includes offline tooling/frontend cases; it is not 394 distinct database-only tests.
 
-Use Python 3.12 and a local PostgreSQL installation with `btree_gist`. Create a virtual environment, install the pinned dependencies, configure a private database URL and apply migrations through `0008` to a new developer database. The [setup guide](docs/developer/SETUP.md) gives the exact steps and startup command.
+C03 independently reviewed the source/evidence, confirmed the test-setup diagnosis and returned **PASS WITH CONDITIONS**. C03 did not independently rerun the full PostgreSQL suite. Its provenance/claim conditions were subsequently verified, followed by the controller's technical freeze. [Sanitized verification record and safe commands](docs/testing/README.md). Raw academic audit material remains private.
 
-The [fictional demo guide](demo/README.md) prepares an isolated developer fixture. It never selects a running human-testing environment automatically.
+## User evaluation
 
-## Demo accounts
+Case-organisation staff and friends/family participated in qualitative evaluation. Reported observations indicated clearer Customer navigation/booking, Staff workflow and Admin information after refinement. No percentages, measured timing improvement, satisfaction scores or general-market usability are claimed. Exploring Staff/Admin interfaces does not confer professional role expertise.
 
-**Fictional demonstration credentials only.** These accounts exist after explicitly applying the developer fixture, not on a public service.
+## Screenshots
 
-| Role | Email | Password |
-|---|---|---|
-| Customer | `customer.repro@petops.example` | `DemoPass!123` |
-| Staff | `staff.repro@petops.example` | `DemoPass!123` |
-| Admin | `admin.repro@petops.example` | `DemoPass!123` |
+Original captures using fictional demonstration records, not real customers or participant results.
 
-## Scope and licensing
+![Admin Insights with explicit reporting period](assets/screenshots/admin-insights-desktop.jpg)
 
-PetOps covers Grooming and Boarding for Customer, Staff and Admin. It does not implement payments, inventory or payroll. This repository is a curated project snapshot with a new, truthful Git history; the original development evidence is retained separately.
+[Six-screen role gallery](assets/README.md).
 
-No open-source license has been selected. See the [licensing note](LICENSING.md) and [release status](docs/RELEASE.md).
+## Demo and local setup
+
+Use your own new local PostgreSQL databases; never reuse a retained UAT/demo database. [Setup](docs/developer/SETUP.md) covers dependencies, private environment configuration, migrations, startup and tests. The [demo guide](demo/README.md) supplies fictional accounts, a short walkthrough and guarded reset/troubleshooting. Fresh-machine installation has not been certified. No public service is deployed by this repository.
+
+## Limitations
+
+No production readiness/security, fresh-machine deployment, comprehensive accessibility/cross-browser/zoom or recovery certification. External Staff leave/absence is not a current implemented MUST; occupied-unit transfer is outside scope; generic exceptional active-state override remains undefined. Edit preflight is not a universal atomic concurrent-edit protocol. No payments, payroll, inventory or commercial multi-tenant platform. [Detailed limitations](docs/testing/LIMITATIONS.md).
+
+## AI-assisted development and academic context
+
+AI tools assisted implementation, debugging and documentation. This repository does not claim every line was manually authored or that its owner has senior engineering experience. Project discussion should focus on substantiated requirements/design decisions, validation, testing and the ability to explain the system; the presence of an artifact does not prove personal mastery. This is an academic FYP portfolio, not the full assessed workspace or private research archive.
+
+## Licensing and release
+
+Project code and documentation are available under the [MIT License](LICENSE), copyright (c) 2026 Ahmad Sahil Nair. Third-party dependencies retain their respective licenses. Private academic/UAT/audit material is excluded. See [licensing scope](LICENSING.md) and [version boundaries](docs/RELEASE.md). GitHub visibility remains a separate owner decision.

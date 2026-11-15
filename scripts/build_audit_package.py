@@ -76,7 +76,8 @@ SENSITIVE_NAME_FRAGMENTS = {
 }
 
 DEFAULT_INCLUDE_UNTRACKED_PREFIXES = (
-
+    "docs/current/",
+    "docs/agent-workflow/",
 )
 
 
@@ -147,7 +148,7 @@ def collect_files(repo: Path) -> list[str]:
                     if safe_rel(rel):
                         selected.add(rel)
 
-    for filename in ():
+    for filename in ("AGENTS.md", "WORKFLOW.md"):
         p = repo / filename
         if p.is_file() and safe_rel(filename):
             selected.add(filename)
@@ -158,10 +159,10 @@ def collect_files(repo: Path) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", default=".", help="Repository root (default: .)")
-    parser.add_argument("--label", default="Review", help="Review package label")
+    parser.add_argument("--label", default="Gate", help="Package label, e.g. Slice2")
     parser.add_argument(
         "--output-dir",
-        default=".local/audit_packages",
+        default="audit_packages",
         help="Output directory relative to repo unless absolute",
     )
     args = parser.parse_args()

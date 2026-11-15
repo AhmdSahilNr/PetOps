@@ -1,7 +1,10 @@
 {
-  "application_candidate": "dbdedb8ce5cea8979cf296108c8658dbb1c032a2",
-  "source_fingerprint_sha256": "badada3b69cfb4590529c4e5d4c376348ce69e2110085d9f9aba58fe6ac1bb92",
-  "source_files": [
+  "application_commit": "e174d81ed2b170928d070c12dd59adba57bba6a3",
+  "tested_checkpoint": "50b1935216f4d569bf56aeec938c84be47ad9fb0",
+  "documentation_checkpoint": "f86bc9cae069db5e2932da5188afaf6b210f1a77",
+  "combined_fingerprint": "464eb3808101c7d3a3ee302bd63099b50c8d74ad32cbe4b294aa7fbf5f1be932",
+  "algorithm": "SHA256 of compact JSON files list with sorted object keys, separators comma/colon; list order preserved. Includes tests.",
+  "files": [
     {
       "path": "alembic.ini",
       "sha256": "81a5f5eb76a2d16e9d522531638cf7188b4ce03d19500699859765b7e04dde71",
@@ -104,8 +107,8 @@
     },
     {
       "path": "app/dashboard.py",
-      "sha256": "4462e83b0ea212b4862ede7c607111f839d1e6bd8b6efc31037e41b51b28f2e1",
-      "bytes": 6560
+      "sha256": "fb6d0daa3eeeb60181e3270c5ccf61a5d5381c268ca782218c6b5239a364eff4",
+      "bytes": 10149
     },
     {
       "path": "app/database.py",
@@ -184,8 +187,8 @@
     },
     {
       "path": "app/static/admin.js",
-      "sha256": "e2fdc6bbc22637b2aa1b23ed30d1b9ee7a9ef8a9011cb496f73c050e891869d5",
-      "bytes": 20158
+      "sha256": "f25e661d9d8eaf10d30fe1146cd8808f4a27e7a0ba6ad8b24aae931a254a743a",
+      "bytes": 20205
     },
     {
       "path": "app/static/boarding.js",
@@ -219,8 +222,8 @@
     },
     {
       "path": "app/static/customer.js",
-      "sha256": "2118e2fdf6efd3450cfa898bf7291b149020d9261b7e22d5787c1670a69f5df3",
-      "bytes": 11765
+      "sha256": "107a261edc8286fa7eda89fc0f4d1784df5edf36b55325d336baff3ea4bb435d",
+      "bytes": 12415
     },
     {
       "path": "app/static/demo.css",
@@ -239,8 +242,8 @@
     },
     {
       "path": "app/static/index.html",
-      "sha256": "9748d7748ead79d46b63cee3bb64705b46d6faca2917e9ec383395d001d9e1af",
-      "bytes": 5451
+      "sha256": "cb47b519c8224d0c64605304348416f74726c534dfa518c15da9d2bb674d664e",
+      "bytes": 5635
     },
     {
       "path": "app/static/operations.js",
@@ -254,8 +257,8 @@
     },
     {
       "path": "app/static/overview.js",
-      "sha256": "1df78c61c690bbeef216cc012ca97c9af60e65237db62207e943fc6ff4b65806",
-      "bytes": 7386
+      "sha256": "8849232e3504b38bf03c68067e83506a482b1743927fa69cd48af7152ed6961a",
+      "bytes": 13788
     },
     {
       "path": "app/static/product.css",
@@ -266,6 +269,16 @@
       "path": "app/static/product.js",
       "sha256": "8c696236721157d271eb00806c8486913618ec72e6c4f9db83e30fdde388c08b",
       "bytes": 3527
+    },
+    {
+      "path": "app/static/refinement.css",
+      "sha256": "d2f85ac37043420b654925d4c3a5e0bdc48c1639510d3771ed18e73485f7038f",
+      "bytes": 11542
+    },
+    {
+      "path": "app/static/refinement.js",
+      "sha256": "ca2d80c3f48689b7ea53eb7c89961440a590737220699e753dc6298a5adef03a",
+      "bytes": 2957
     },
     {
       "path": "app/static/shell.js",
@@ -289,8 +302,8 @@
     },
     {
       "path": "app/static/staff.js",
-      "sha256": "470caf9ff1bd3158ee19b83da38b9e9071c98004706ccd785ccd31e726010ec4",
-      "bytes": 17170
+      "sha256": "8eada80984dc0db3b84779387170d4774e81cc7160eae629184bdfb66937c276",
+      "bytes": 17270
     },
     {
       "path": "app/views.py",
@@ -301,6 +314,11 @@
       "path": "requirements.txt",
       "sha256": "74171ef4d044cb84648f2cecedac11894acec5ff3ee6c474ada366210f336570",
       "bytes": 90
+    },
+    {
+      "path": "scripts/final_demo.py",
+      "sha256": "3ccbed1cf54482a769f5a4c8050e67518bc1080406bae26780013c0126060921",
+      "bytes": 14774
     },
     {
       "path": "tests/__init__.py",
@@ -329,8 +347,8 @@
     },
     {
       "path": "tests/test_hardening.py",
-      "sha256": "c730dda3d545e5b79755cf4240a1be8a6c145a2b20ea29be9afcfa269f6cd9ae",
-      "bytes": 27460
+      "sha256": "82138de1c82657827f40432428379b0f427ee84b53d232cae5423a788a98aae0",
+      "bytes": 27654
     },
     {
       "path": "tests/test_product_simplification.py",
@@ -339,8 +357,8 @@
     },
     {
       "path": "tests/test_slice2.py",
-      "sha256": "7efe91825bbdc8d5e7f89e62cc68fbfb0cb07b86d0173be2e098dc1888299098",
-      "bytes": 26071
+      "sha256": "13fac95588e8a056fa453e6d2c5b372a38b8312da192d767924a590d4527ac54",
+      "bytes": 25998
     },
     {
       "path": "tests/test_slice3.py",
@@ -372,7 +390,5 @@
       "sha256": "48fd53b6d4579856e906951656927bc72d3eeab2c25d7a7d06bd6dfa7edbf5ae",
       "bytes": 5857
     }
-  ],
-  "original_record_sha256": "589ae9cd911ba5172eaad85aa77eceb613ce9167f35d21e15d4652dc90dfceaa",
-  "scope": "Historical candidate source inventory; repository documentation/tooling are separate."
+  ]
 }

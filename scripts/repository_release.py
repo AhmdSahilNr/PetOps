@@ -8,9 +8,9 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-TEXT_SUFFIXES = {'.py', '.js', '.mjs', '.css', '.html', '.md', '.txt', '.json', '.csv', '.sql', '.ini', '.example', '.yml', '.yaml', '.mako'}
+TEXT_SUFFIXES = {'.py', '.js', '.mjs', '.css', '.html', '.md', '.txt', '.json', '.csv', '.sql', '.ini', '.example', '.yml', '.yaml'}
 PRIVATE_PARTS = {'.git', '.local', '.venv', 'private', 'participants', 'participant_data', 'uat_private', 'case_organisation_private', 'consent_forms'}
-PUBLIC_DOCS = {'assets/README.md', 'docs/testing/targeted-result.json', 'assets/screenshots/customer-booking.jpg', 'assets/screenshots/admin-overview.jpg', 'docs/RELEASE.md', 'docs/database/README.md', 'scripts/README.md', 'assets/screenshots/boarding-responsibility-history.jpg', 'docs/testing/README.md', 'docs/architecture/README.md', 'docs/testing/LIMITATIONS.md', 'assets/screenshots/insights.jpg', 'docs/testing/source-manifest.json', 'LICENSING.md', 'docs/analysis/README.md', 'docs/testing/targeted-result.txt', 'docs/workflows/README.md', 'assets/screenshots/staff-my-work-mobile.jpg', 'demo/README.md', 'docs/developer/SETUP.md'}
+PUBLIC_DOCS = {'README.md', 'docs/developer/SETUP.md', 'docs/developer/DEMO.md', 'docs/repository/PUBLIC_README_SKELETON.md', 'docs/repository/RELEASE_POLICY.md'}
 PUBLIC_SCRIPTS = {'scripts/repro_demo.py', 'scripts/repository_release.py', 'scripts/test_repository_hardening.py', 'scripts/build_audit_package.py'}
 ROOT_FILES = {'README.md', '.gitignore', '.gitattributes', '.env.example', 'alembic.ini', 'requirements.txt', 'requirements.lock.txt'}
 PATTERNS = {
@@ -81,7 +81,7 @@ def export(destination):
         raise ValueError('Use a new output file inside .local/release_staging')
     names = sorted(n for n in git('ls-files', '--cached', '--others', '--exclude-standard', '-z').decode().split('\0') if n and public_path(n))
     def source(name):
-        p = ROOT / name
+        p = ROOT / ('docs/repository/PUBLIC_README_SKELETON.md' if name == 'README.md' else name)
         if p.is_symlink() or ROOT not in p.resolve().parents:
             raise ValueError('Export refuses symlinks or paths outside the repository')
         return p
@@ -92,8 +92,8 @@ def export(destination):
     if blocking: raise ValueError('Export refused: secret-pattern candidates require review (run inventory)')
     destination.parent.mkdir(parents=True, exist_ok=True)
     manifest = {'source_head': git('rev-parse', 'HEAD').decode().strip(), 'worktree_clean': not bool(git('status', '--porcelain').strip()),
-                'publication_approved': False, 'policy': 'Explicit source/docs and reviewed-fictional-asset allowlist; no original .git, private study/case documents or runtime data',
-                'readme_source': 'README.md',
+                'publication_approved': False, 'policy': 'Explicit source/docs allowlist; no .git, historical evidence, study/case documents, screenshots or runtime data',
+                'readme_source': 'docs/repository/PUBLIC_README_SKELETON.md',
                 'files': [{'path': n, 'sha256': hashlib.sha256(source(n).read_bytes()).hexdigest()} for n in names]}
     with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED) as z:
         for name in names: z.write(source(name), name)

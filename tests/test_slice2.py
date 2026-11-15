@@ -205,8 +205,8 @@ def test_admin_reallocation_retains_old_row_and_staff_can_only_view(case):
     unit=c['client'].post('/admin/accommodations',headers=c['admin'],json={
         'name':'Second Fictional Unit','category':'Fictional','capacity':1,'notes':'Fictional suitability note'}).json()
     second=allocate(c,b,uuid.UUID(unit['id'])).json()
-    start=datetime.combine(c['day'],datetime.min.time(),timezone.utc)
-    assign(c,b,starts_at=start.isoformat(),ends_at=(start+timedelta(hours=1)).isoformat())
+    # PS-02: initial Boarding responsibility inherits the planned stay.
+    assign(c,b)
     staff=login(c['client'],c['seed']['staff1'].email,'DemoPass!123')
     response=c['client'].get(f"/staff/bookings/{b['id']}",headers=bearer(staff))
     assert response.status_code==200 and response.json()['accommodation_allocations'][0]['id']==second['id']

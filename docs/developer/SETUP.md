@@ -1,12 +1,10 @@
-# Run a local developer copy
+# Run a local copy
 
-Use a new developer copy and new local databases. Never run setup, fixture reset or application tests against a database collecting human observations.
+Use your own new local PostgreSQL databases. These instructions are for an isolated developer demonstration, not production deployment or a fresh-machine certification. Do not point them at retained participant, organisation or maintainer databases. A filename ending `_test` is not evidence that a database is disposable.
 
-## Dependencies
+## Install dependencies
 
-The recorded environment used Python 3.12.14 and PostgreSQL 18.6. A fresh installation on another machine has not yet been verified. PostgreSQL needs the `btree_gist` extension. Node 20 or later is needed only for the built-in JavaScript test harnesses; no npm packages or frontend build step are required.
-
-From the repository root in PowerShell:
+The recorded environment was Python3.12.14 and PostgreSQL18.6. The lock pins the executed Python packages, including test dependencies. Node20+ is required for existing JS harnesses; no npm install or frontend build is needed. PostgreSQL must support `btree_gist`.
 
 ```powershell
 py -3.12 -m venv .venv
@@ -14,80 +12,82 @@ py -3.12 -m venv .venv
 .venv/Scripts/python.exe -m pip check
 ```
 
-On a POSIX shell, use `python3.12` and `.venv/bin/python`. The requirements file includes an exact lock of the executed environment, including development/test dependencies.
+For POSIX use `python3.12`, `.venv/bin/python` and the equivalent environment-variable syntax. This guide does not claim those platforms were freshly installed/tested. All following Python commands assume the virtual environment is activated, or replace `python` with its executable.
 
-## Create separate PostgreSQL databases
+## Create your own empty targets
 
-Start your own loopback PostgreSQL server. The example uses port 5432; use the port of your installation. In `psql`, as your local administrator:
+On your own loopback PostgreSQL installation, connect using `psql` as its administrator. The example uses port5432; use your actual local port.
 
 ```sql
 CREATE ROLE petops_dev LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE;
 \password petops_dev
-CREATE DATABASE petops_repro_demo_test OWNER petops_dev;
-CREATE DATABASE petops_regression_test OWNER petops_dev;
+CREATE DATABASE petops_final_candidate_demo_test OWNER petops_dev;
+CREATE DATABASE petops_portfolio_regression_test OWNER petops_dev;
 ```
 
-Enter a new local password interactively. These must be newly created databases. Do not rename or reuse a retained database to pass a name guard. The first database belongs exclusively to the managed fictional fixture; the second is for destructive application test fixtures.
+Enter a new password privately. If either database already exists, stop and establish its owner/purpose; do not drop or repurpose it. The frozen final-demo helper requires that exact demo database name. If it is already in use for retained records, use a separate new local PostgreSQL instance rather than changing the helper's guards. This task did not create, reset or seed any database.
 
-This local owner setup permits migrations/extensions. It is not a production least-privilege deployment recipe. If extension installation is restricted by your PostgreSQL installation, have its local administrator install `btree_gist` in the new database.
+The developer owner needs local migration/extension privileges. If `btree_gist` installation is denied, ask the local PostgreSQL administrator to install it in the NEW targets. This is not production least-privilege configuration; production grants, including `staff_responsibilities`, need separate review.
 
-## Private environment configuration
+## Configure privately
 
-The application reads `PETOPS_DATABASE_URL`; environment variables override an optional root `.env` file. Copy `.env.example` only as a starting template and replace its placeholders privately. Never commit real database URLs, passwords or runtime configuration. URI-encode reserved characters in a URL password.
+From the repository root, activate the venv and enter the dedicated demo URL privately in the same PowerShell terminal:
 
-For the managed fixture, supply `PETOPS_REPRO_DATABASE_URL` explicitly. Its required shape is shown below with a placeholder password; this is not a working credential:
+```powershell
+.venv/Scripts/Activate.ps1
+$demoSecret = Read-Host 'Your NEW local final-demo database URL' -AsSecureString
+$env:PETOPS_FINAL_DEMO_DATABASE_URL = [System.Net.NetworkCredential]::new('', $demoSecret).Password
+Remove-Variable demoSecret
+$env:PETOPS_DATABASE_URL = $env:PETOPS_FINAL_DEMO_DATABASE_URL
+$env:PETOPS_REMINDER_POLL_SECONDS = '0'
+```
+
+URL shape, with a placeholder rather than working credentials:
 
 ```text
-postgresql+psycopg://petops_dev:REPLACE_ME@127.0.0.1:5432/petops_repro_demo_test
+postgresql+psycopg://petops_dev:REPLACE_ME@127.0.0.1:5432/petops_final_candidate_demo_test
 ```
 
-One way to enter your real local URL without putting it into shell history:
+URI-encode reserved password characters. Never print/store the actual URL in Git, screenshots or transcripts. Optional `.env` is ignored; `.env.example` is only a placeholder. Environment values override `.env`. The frozen application and `alembic.ini` retain old development fallback URLs: explicit configuration is required. The demo helper reads its dedicated process environment variable, not that setting from `.env`.
+
+Before setup, confirm the target using `psql`/your DB client: `SELECT current_database(), current_user, inet_server_addr(), inet_server_port();`. Confirm owner/purpose, loopback server and an empty public schema. Do not use the maintainer's existing demo/UAT server merely because its name matches this example.
+
+## Migrations and fictional data
+
+For the professional fixture, follow [demo instructions](../../demo/README.md). **First apply must start from an empty database:** the guarded helper applies unchanged Alembic migrations0001–0008 and creates its own fixture marker. Do not manually run migrations first on an unowned final-demo target; that makes the helper correctly refuse it.
+
+For another NEW non-fixture developer/test database, privately select it with `PETOPS_DATABASE_URL`, then existing migration commands are:
 
 ```powershell
-$privateUrl = Read-Host 'Dedicated developer database URL' -AsSecureString
-$env:PETOPS_REPRO_DATABASE_URL = [System.Net.NetworkCredential]::new('', $privateUrl).Password
-Remove-Variable privateUrl
-$env:PETOPS_DATABASE_URL = $env:PETOPS_REPRO_DATABASE_URL
+python -m alembic upgrade head
+python -m alembic current
+```
+
+Head is0008. Alembic reads the application URL; editing only `sqlalchemy.url` does not select a target. Preserve all revisions/SQL; some upgrades are forward-only. Never use downgrade/deleting migration history as a reset method. Pytest applies migrations itself to its separately verified disposable database.
+
+## Start the application
+
+After fictional setup and checking `SELECT version_num FROM alembic_version` returns0008:
+
+```powershell
+$env:PETOPS_DATABASE_URL = $env:PETOPS_FINAL_DEMO_DATABASE_URL
 $env:PETOPS_REMINDER_POLL_SECONDS = '0'
+python -m uvicorn app.main:app --host 127.0.0.1 --port 58120
 ```
 
-Keep the same terminal for the following commands. Do not print the environment variable or paste it into screenshots/logs. The fixture CLI requires the process environment variable; it does not load this setting from `.env` by itself.
+Open `http://127.0.0.1:58120`. Choose an unused port instead of stopping another process. Ctrl+C stops your foreground server. The client is served by this application; do not open index.html directly as a file. Polling0 keeps reminders manual for this demonstration; normal polling/Admin lead settings remain supported behaviour. Production cookie/proxy/TLS configuration is outside this guide.
 
-## Migrations
+## Tests and troubleshooting
 
-Confirm that the resolved URL names your newly created developer database before proceeding:
+[Testing](../testing/README.md) gives offline and full-suite commands. Application tests migrate/TRUNCATE their explicitly chosen disposable target; never use the demo URL for them. Set both test/app URLs privately to the new separate regression target before running pytest.
 
-```powershell
-.venv/Scripts/python.exe -m alembic upgrade head
-.venv/Scripts/python.exe -m alembic current
-```
+| Symptom | Check |
+|---|---|
+| Connection refused/login to DB fails | Local PostgreSQL running, correct port/role/password/URL encoding; no fallback URL selected |
+| Missing extension or permission denied | `btree_gist` and migration privileges on your new database |
+| Demo rejects existing schema/marker/accounts | Stop; inspect exact target and ownership. Reset only the known disposable fixture as documented |
+| Plan dates rejected on apply | Use today's Malaysia date; no fake clock or historical apply |
+| Browser will not load | Uvicorn startup output, correct active venv/root/URL and unused port |
+| JS checks fail to launch | Node on PATH or `PETOPS_NODE` points to it |
 
-Current head is `0008`. Alembic reads the application setting, so editing `sqlalchemy.url` in `alembic.ini` alone does not select the target. Both the application and ini file retain old development placeholder URLs: always override them. Preserve migrations `0001`–`0008`, associated SQL and the revision template. Some migrations are intentionally forward-only; do not use downgrades as a fixture reset mechanism.
-
-## Fictional data and startup
-
-Follow the [fictional demo guide](../../demo/README.md) to inspect the plan and explicitly populate the empty developer database. Then:
-
-```powershell
-$env:PETOPS_DATABASE_URL = $env:PETOPS_REPRO_DATABASE_URL
-$env:PETOPS_REMINDER_POLL_SECONDS = '0'
-.venv/Scripts/python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 58120
-```
-
-Open `http://127.0.0.1:58120` and use the [fictional accounts](../../demo/README.md). Choose another free port if needed; do not stop an existing human-testing process to obtain it. Polling `0` disables the technical reminder sweep for this developer demonstration. Admin reminder lead settings and normal reminder behavior remain existing application features.
-
-## Tests
-
-Offline tooling checks avoid the application database fixtures:
-
-```powershell
-.venv/Scripts/python.exe -m unittest scripts.test_repository_hardening -v
-node tests/ui_races.mjs
-node tests/ui_product.mjs
-```
-
-Application pytest fixtures migrate and clear the selected database. Set `PETOPS_TEST_DATABASE_URL` privately to the separate `petops_regression_test` database before any later authorized application run, and verify the target. Never select a demo or human-testing database, even if its name ends in `_test`. Install Node on `PATH` or set `PETOPS_NODE` to its executable. The [testing guide](../testing/README.md) records the historical selection and remaining verification; this setup guide does not claim a final regression result.
-
-## Common setup issues
-
-An unset URL selects the legacy development fallback. A wrong port/role prevents connection; missing extension/DDL privileges prevents migration; missing Node prevents JavaScript harness integration. A past fixture anchor date prevents new bookings. Resolve configuration on the new developer target rather than altering business guards or editing booking history directly. Production deployment and secure-cookie configuration are outside this local guide.
+Do not fix setup by editing business guards, raw booking states/history or disabling authorization. Keep runtime logs/local configuration private. A new reader's install remains unverified until actually performed.

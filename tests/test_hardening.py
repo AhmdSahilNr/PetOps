@@ -330,6 +330,12 @@ def test_database_rejects_invalid_booking_mutations(client, seed_base, booking_c
 @pytest.mark.parametrize('defect', ['customer_role','blank_pet','blank_customer','blank_service','email_case','customer_role_change','staff_role_change'])
 def test_database_rejects_invalid_account_and_name_links(client, seed_base, booking_case, defect):
     _, pet, b = booking_case
+    if defect == 'staff_role_change':
+        # PS-02/0008: valid assignment includes responsibility and attributed history.
+        admin = bearer(login(client, seed_base['admin'].email, 'DemoPass!123'))
+        response = client.put(f"/admin/bookings/{b['id']}/staff", headers=admin,
+                              json={'staff_user_id': str(seed_base['staff1'].id)})
+        assert response.status_code == 200, response.text
     with SessionLocal() as db:
         row = db.get(Booking,uuid.UUID(b['id']))
         customer = db.get(Customer,row.customer_id)
@@ -340,10 +346,6 @@ def test_database_rejects_invalid_account_and_name_links(client, seed_base, book
         elif defect == 'email_case': db.get(User,customer.user_id).email = 'UPPER@petops.example'
         elif defect == 'customer_role_change': db.get(User,customer.user_id).role = Role.ADMIN
         elif defect == 'staff_role_change':
-            row.assigned_staff_user_id = seed_base['staff1'].id
-            row.staff_start = row.grooming_start
-            row.staff_end = row.grooming_start + timedelta(minutes=row.grooming_duration_minutes)
-            db.commit()
             db.get(User,seed_base['staff1'].id).role = Role.ADMIN
         with pytest.raises(IntegrityError): db.commit()
         db.rollback()

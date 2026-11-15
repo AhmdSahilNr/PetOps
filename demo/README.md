@@ -1,21 +1,54 @@
-# Reproducible fictional developer fixture
+# Recruiter demonstration — 3–5 minutes
 
-Use only petops_repro_demo_test, a separately created loopback PostgreSQL database. It must never be used for human sessions. No current runtime is selected automatically. The CLI does not start/stop servers, create databases or touch main/demo/UAT targets.
+Prepare your own local environment using [setup](../docs/developer/SETUP.md) before the walkthrough. All identities/records below are fictional. No public live deployment is claimed.
+
+## Prepare the story
+
+From the repository root with dependencies installed and your new empty `petops_final_candidate_demo_test` explicitly configured:
 
 ```powershell
-# Plan: no database connection or write.
-.venv/Scripts/python.exe -m scripts.repro_demo --anchor-date YYYY-MM-DD
-# Set PETOPS_REPRO_DATABASE_URL privately, then explicitly apply to the new empty DB.
-.venv/Scripts/python.exe -m scripts.repro_demo --anchor-date YYYY-MM-DD --apply
-# Later, reset ONLY this fixture-owned developer database:
-.venv/Scripts/python.exe -m scripts.repro_demo --anchor-date YYYY-MM-DD --reset --apply
+# Plan only: no database connection or writes.
+python -m scripts.final_demo --anchor-date YYYY-MM-DD
+# Explicitly apply only to your own new empty target.
+python -m scripts.final_demo --anchor-date YYYY-MM-DD --apply
 ```
 
-Choose the actual MYT date or a future anchor; past dates are refused. Same anchor yields the same named configuration, service order, relative schedules and semantic states. UUIDs, salted password hashes and recorded event/session timestamps are deliberately not identical. This is deterministic fixture content, not byte-identical history.
+Replace YYYY-MM-DD with **today's Malaysia date** for apply. The helper requires `PETOPS_FINAL_DEMO_DATABASE_URL`, validates the exact loopback database/ownership, applies existing0001–0008 migrations, marks its fixture and uses supported handlers to create17 bookings/8 fictional users/8 pets. First apply requires empty schema; do not manually pre-migrate it. It does not create the database or start a server. Unexpected existing schema/marker/accounts are refused. Applying takes longer than the plan because operations are genuine handler calls and Grooming reaches its scheduled time before starting.
 
-Accounts admin.repro@petops.example, staff.repro@petops.example and customer.repro@petops.example use public fictional password DemoPass!123. No personal/organisation data is used. Three pets and services support a Requested Grooming, Confirmed Grooming and Confirmed Boarding booking. Staff timing is derived by existing handlers, with no generic availability rows. Completed-care facts are not invented; perform a later developer walkthrough through the normal UI if needed and label it honestly.
+The story includes requested/confirmed/staying/completed/cancelled/rejected records, responsibilities, events, care notes and operational summaries. UUIDs, salted hashes, sessions and actual timestamps vary; semantic content repeats for a valid anchor. Care is an accelerated fictional walkthrough, not proof of real elapsed service. All events are created now, so do not present the seeded chart as historical demand.
 
-The tool bootstraps one fixed-ID fictional Admin, then uses the application's normal API handlers for business setup. It records a developer database comment as an ownership marker (not an application table/schema change). Reset requires the exact database name, loopback address, marker, bootstrap identity and only known fixture account emails. A partial fixture can be retried with reset if those ownership checks hold. Unexpected accounts/markers stop the reset. Back up anything needed before explicitly resetting this disposable fixture; it is not a preservation mechanism.
+Start Uvicorn and confirm0008 using [setup](../docs/developer/SETUP.md). These public fictional credentials exist **only after explicit fixture apply**; never reuse them for real users or expose an internet service with them.
 
+| Role | Email | Password |
+|---|---|---|
+| Customer | `nadia.zainal@petops.example` | `DemoPass!123` |
+| Staff | `daniel.tan@petops.example` | `DemoPass!123` |
+| Admin | `farah.ismail@petops.example` | `DemoPass!123` |
 
-For environment configuration and startup, follow the [setup guide](../docs/developer/SETUP.md). Replace YYYY-MM-DD with the current or a future Malaysia date.
+The helper also creates Staff Aisyah Rahman/Amir Hakim and Customers Mei Ling/Arif Hakim/Maya Krishnan; their exact reserved emails are in [final_demo.py](../scripts/final_demo.py), with the same fictional password. Keep login fields out of screenshots.
+
+## Walkthrough
+
+| Time | Show / explain |
+|---|---|
+|0:00–0:30|Business problem: connected booking, capacity, responsibility and service history rather than scattered reservations/remarks.|
+|0:30–1:10|Customer Home → Book a service → owned pet/service/schedule → review. Explain Admin confirmation; avoid creating an extra request unless deliberately demonstrating mutation on your disposable fixture.|
+|1:10–1:50|Admin Overview/Bookings → request detail → prepare Staff/accommodation → confirm/reject. Availability is PetOps conflicts/capacity, not employee attendance.|
+|1:50–2:30|Staff My Work → assigned Boarding stay/detail. Show care/history and bounded responsibility; future assignee cannot act early.|
+|2:30–3:10|Existing completed Grooming/Boarding records and event/responsibility history. Explain Check In→Staying→Check Out→Completed and preserved original handover plan; do not fake elapsed care.|
+|3:10–4:00|Admin Insights: selected period, requests, decision-based confirmation rate, actual completions, current capacity and assigned work. Explain their different date bases.|
+|4:00–4:30|394/394 final regression and independent PASS WITH CONDITIONS; qualitative human observations; production/security/accessibility/fresh-machine limits.|
+
+Use separate browser sessions if showing roles side by side, or log out before changing roles. Counts change if you perform real actions; never claim a stale screenshot is a live query. Older fixture dates need deliberate regeneration of your own disposable fixture for a later day.
+
+## Reset and recovery
+
+Only on your own explicitly disposable exact fixture:
+
+```powershell
+python -m scripts.final_demo --anchor-date YYYY-MM-DD --reset --apply
+```
+
+Reset additionally requires the fixture marker, bootstrap Admin identity and known fictional account set. It truncates only that target's business rows and rebuilds through normal handlers, retaining migrations. It is not backup/recovery certification. Never reset a maintainer/participant/organisation database or one containing records you need. A partial owned fixture can be inspected and retried only if these guards hold; unexpected accounts or ownership require investigation, not forced cleanup.
+
+If startup fails, check the setup troubleshooting table and environment before changing anything. The small older `repro_demo` fixture remains as legacy tooling/test source but is not this gallery's17-booking story; do not mix its credentials/URLs into this guide. This preparation task ran plan/offline checks only; it did not reseed a retained runtime.

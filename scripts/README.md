@@ -1,11 +1,9 @@
 # Developer tools
 
-| Tool | Purpose |
-|---|---|
-| `python -m scripts.repro_demo --anchor-date YYYY-MM-DD` | Print the fictional fixture plan without connecting to a database; see the [demo guide](../demo/README.md) for explicitly applying/resetting its dedicated developer database |
-| `python -m unittest scripts.test_repository_hardening -v` | Seven offline checks for target guards, exclusions and fixture planning |
-| `python -m scripts.repository_release inventory --history --output .local/review.json` | Redacted heuristic review of tracked files and reachable history; not a privacy certification |
-| `python -m scripts.repository_release export --output .local/release_staging/review.zip` | Explicitly allowlisted review ZIP with source HEAD and hashes; never pushes or approves publication |
-| `python scripts/build_audit_package.py --output-dir .local/audit_packages` | Package tracked technical evidence with provenance; does not run tests or award acceptance |
+- `python -m scripts.final_demo --anchor-date YYYY-MM-DD`: plan only; [demo](../demo/README.md) explains guarded apply/reset for its exact owned database.
+- `python -m unittest scripts.test_repository_hardening -v`: seven offline checks; no application DB fixture.
+- `python -m scripts.repository_release inventory --history --output .local/review.json`: redacted heuristic inventory, not privacy certification.
 
-Source/export tooling requires Git on `PATH`. Inventories, archives, runtime logs and private configuration belong in ignored `.local`, not in hosted source. The application pytest fixtures are separate and destructive to their selected database.
+Legacy repository_release export and build_audit_package utilities are retained byte-identical as dependencies of the existing tooling tests. The former uses an academic-era allowlist/README path and is not the exporter for this curated portfolio: it may omit gallery/docs or refuse the absent old README source. Do not use either as a public-release command. Packaging for this review is prepared outside hosted source with explicit file/hash validation. No frozen helper behaviour was changed to hide that inconsistency.
+
+Secrets, runtime files, generated archives and inventories belong outside hosted source or in ignored.local. Application pytest is destructive to its explicitly selected database; see [testing](../docs/testing/README.md).

@@ -1,27 +1,23 @@
 # Interface gallery
 
-Five images were selected from the existing 0008 candidate walkthrough. They show fictional demonstration accounts and records, not participants or real service delivery. The original pixels are retained; none was generated or retouched for this repository. Dates, counts and example records reflect capture time.
+Six original, unretouched captures from the final application candidate e174d81, using fictional demo records. No new runtime capture or participant session is claimed. The Customer/Staff presentation was preserved; final core Insights captures include the r3 status restoration. Counts/dates reflect capture time, not business results or measured usability. Some auxiliary captures preceded the final fixture rebuild; they illustrate their named screens rather than a synchronized database snapshot.
 
-The project owner approved this gallery and its sharing rights for private repository hosting on 15 November 2026. Public release remains a separate decision. Visual inspection found no visible private contact details, browser profile chrome or local machine paths; that is a bounded review, not an absolute privacy guarantee.
+## Customer navigation
+![Customer Home with a clear booking action](screenshots/customer-home-mobile.jpg)
 
-## Customer booking
+## Customer booking review
+![Customer reviewing a Grooming request](screenshots/customer-grooming-review-mobile.jpg)
 
-![Customer selecting an owned pet and service](screenshots/customer-booking.jpg)
+## Staff assigned work
+![Staff My Work showing an assigned Boarding stay](screenshots/staff-work-desktop.jpg)
 
-## Admin Overview
+## Admin operational queue
+![Admin Overview and requests needing review](screenshots/admin-overview-desktop.jpg)
 
-![Admin operational overview and requests needing review](screenshots/admin-overview.jpg)
+## Admin Insights
+![Selected-period operational KPI summaries](screenshots/admin-insights-desktop.jpg)
 
-## Staff My Work on mobile
+## Status and responsibility measures
+![Booking status and assigned work with explicit definitions](screenshots/admin-status-and-assigned-work.jpg)
 
-![Mobile Staff view showing assigned active work](screenshots/staff-my-work-mobile.jpg)
-
-This is a narrow mobile capture. A later approved desktop capture would communicate Staff queue detail more clearly; no new capture or runtime changes were made for repository preparation.
-
-## Boarding responsibility history
-
-![Original and replacement fictional Staff responsibility periods](screenshots/boarding-responsibility-history.jpg)
-
-## Insights
-
-![Period-based operational counts using fictional data](screenshots/insights.jpg)
+Visible identities and records are fictional. These images contain no login credentials, participant forms, real business data or browser profile chrome. Their source/privacy review is bounded, not a guarantee about all possible metadata. Customer history and detailed Boarding handover can be inspected in the local demo; no missing screenshot was fabricated.
