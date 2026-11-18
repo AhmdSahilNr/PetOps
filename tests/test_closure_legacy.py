@@ -41,7 +41,8 @@ def test_pre0007_legacy_facts_and_bounded_compatibility(stay,state):
     path=f'/boarding/bookings/{bid}'
     before=c['client'].get(path,headers=c['staff']).json()
     assert before['booking']['status']==state
-    assert c['client'].get(path,headers=c['owner']).json()==before
+    from tests.revamp_views import as_owner_sees, core  # 2026-11-18 D4 contract
+    assert core(c['client'].get(path,headers=c['owner']).json())==as_owner_sees(before)
     assert before['boarding_stay']['checked_in_at']==now.isoformat()
     if state=='CHECKED_IN':
         act(c,'complete',expected=409)

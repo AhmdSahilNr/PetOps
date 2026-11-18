@@ -40,13 +40,15 @@ def notification_view(db,n):
     from .services import schedule_snapshot
     b=db.get(Booking,n.booking_id)
     permitted=(db.get(Customer,b.customer_id).user_id==n.recipient_user_id) if n.recipient_role==Role.CUSTOMER else can_inspect(db,b,n.recipient_user_id)
+    staff=n.recipient_role==Role.STAFF
+    # A former Staff recipient must not see pet, service or schedule details, so the stored context is not read.
+    hidden=staff and not permitted
     event=db.get(BookingEvent,n.source_event_id)
-    context=(event.details or {}).get('notice_context',{}) if event else {}
+    context=(event.details or {}).get('notice_context',{}) if event and not hidden else {}
     # Legacy notices have no event snapshot. Only an entitled account may resolve current names.
     if not context and permitted:
         context={'pet_name':db.get(Pet,b.pet_id).name,'service_name':db.get(Service,b.service_id).name,'schedule':event.new_schedule if event and event.new_schedule else schedule_snapshot(b)}
     category='Grooming' if b.booking_type.value=='GROOMING' else 'Boarding'
-    staff=n.recipient_role==Role.STAFF
     label={'BOOKING_SUBMITTED':'request received','BOOKING_CONFIRMED':'booking confirmed','BOOKING_RECONFIRMED':'booking confirmed again',
         'BOOKING_REJECTED':'request rejected','RESCHEDULE_REJECTED':'changed request rejected','BOOKING_RESCHEDULED':'dates changed',
         'BOOKING_CANCELLED':'booking cancelled','BOOKING_REMINDER':'booking reminder','STAFF_ASSIGNED':'assigned','STAFF_REASSIGNED':'assignment changed'}.get(n.kind,'booking update')
@@ -55,7 +57,7 @@ def notification_view(db,n):
         if not permitted:message='You are no longer responsible for this service.'
         elif n.kind in {'STAFF_ASSIGNED','STAFF_REASSIGNED'}:message='You have been assigned this Grooming appointment.' if category=='Grooming' else 'You are responsible for this Boarding stay during your recorded assignment period.'
     elif n.kind=='BOOKING_CONFIRMED':message=f'Your {category} request has been confirmed.'
-    return {"id":str(n.id),"kind":n.kind,"message":message,'title':f'{category} {label}'+(' — '+context['pet_name'] if context.get('pet_name') else ''),
+    return {"id":str(n.id),"kind":n.kind,"message":message,'title':'Booking update' if hidden else f'{category} {label}'+(' — '+context['pet_name'] if context.get('pet_name') else ''),
         'pet_name':context.get('pet_name'),'service_name':context.get('service_name'),'schedule':context.get('schedule'),
         'can_view_booking':permitted,'cta_label':('View assignment' if staff else 'View booking') if permitted else None,
         "booking_id":str(n.booking_id),"booking_type":b.booking_type.value,

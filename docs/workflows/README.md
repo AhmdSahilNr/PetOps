@@ -1,37 +1,51 @@
 # Workflows and role boundaries
 
+The interface shows the stored status SUBMITTED as **Requested**.
+
 ## Customer request
 
 ```mermaid
 flowchart LR
-    Pet[Select an active owned pet] --> Service[Choose Grooming or Boarding]
-    Service --> Availability[Review schedule and capacity]
-    Availability --> Request[Submit request]
-    Request --> Review[Admin review and resources]
+    Pet[Own active pet] --> Type[Grooming or Boarding]
+    Type --> Check[Availability / capacity check]
+    Check --> Request[Request booking]
+    Request --> Review[Admin review and resource preparation]
     Review --> Decision[Confirm or reject]
-    Decision --> History[Notifications and retained history]
+    Decision --> Notify[In-system notification and history]
 ```
 
-Customers can see their own bookings and history. Reschedule/cancel actions depend on the current state. Rescheduling revalidates the new schedule and invalidates resources that must be assigned or allocated again. A notification describes an event; the current booking remains the source of current status and permitted actions.
+The booking journey has five steps: Type, Pet, Service, Date and time, Review. A preferred time or date is a **request** until Admin confirms it. Customers see only their own bookings, with a progress tracker, stay updates or groomer notes, and an activity timeline.
+
+**Reschedule and cancel** are allowed only while a booking is Requested or Confirmed, by the Customer or Admin.
+- Rescheduling returns the booking to Requested and releases the prepared groomer or place.
+- Cancelling releases resources.
 
 ## Grooming
 
-Requested → Admin assigns active, non-conflicting Staff → Confirmed → Start → In progress → Complete → Completed.
+Requested → Admin assigns an eligible groomer and confirms → Confirmed → Start → In progress → Complete (optional notes) → Completed.
 
-The appointment and saved service duration determine the responsibility period. Staff and Admin have bounded fulfilment actions; Grooming is not split or handed over after fulfilment starts. Late-running assigned work remains visible rather than disappearing when its planned period ends.
+- **Eligibility:** an active Staff account with no overlapping unreleased responsibility. Generic availability windows are retired.
+- **Confirmation:** requires a start time that has not passed.
+- **Duration:** the appointment's duration is saved from the service at booking time.
+- **Reassignment:** possible before work starts; there is no handover after work starts.
+- **Admin fallback:** Admin can start and complete as a disclosed fallback.
 
 ## Boarding
 
-Requested → Admin allocates accommodation, optionally assigns Staff → Confirmed → Check In → Staying → Check Out → Completed.
+Requested → Admin allocates accommodation with a free place every night (Staff optional) and confirms → Confirmed → Check in within the reserved dates → Staying → stay updates → Check out → Completed.
 
-Admin handles unassigned Boarding work. Stay notes and operational events retain their actor and time. Check Out releases physical allocation and completes the stay through the existing combined action. Old compatible lifecycle records remain readable.
+- **Check-out** completes the stay and releases the allocation. Admin handles stays with no assigned Staff.
+- **Handover:** during an active stay, Admin can hand over responsibility now or at a future effective time. The original period stays on record.
+  - Until the effective time, the current Staff member keeps both read and write access.
+  - The incoming Staff member can view the work but can't act before the effective time.
+  - Afterwards, the former Staff member is refused, including through old links.
+- **Overdue stays:** an open stay past its planned check-out is labelled **Overdue stay** for visibility only. It keeps its place and its last responsible Staff member until check-out.
 
-For a stay with Staff responsibility, Admin can make a bounded handover now or at a future instant within the planned stay. The original period remains recorded; the effective ending and replacement responsibility are attributed. Current Staff can act, future Staff can inspect upcoming work, and a former assignment alone no longer grants current access. Open overdue stays retain the last responsible actor for checkout.
+## Admin
 
-## Admin management
+- **Daily work:** review and decide requests, prepare resources, follow Today, the Boarding lodging board, Staff work and History.
+- **Settings:** maintain Services, Staff accounts and Boarding setup (units and capacity). Configure Reminders, and review the Change log.
+- **Staff deactivation:** refused while that person still has current or upcoming work.
+- **History is kept:** inactive services and archived pets remain in history but can't be chosen for new requests.
 
-Admin reviews requests, resources, active operations and history; maintains Staff accounts, services and accommodations; and reviews operational counts. Staff deactivation is blocked by unresolved current/upcoming responsibility. Inactive services and archived pets keep their history but cannot be chosen for a new request.
-
-Insights use explicit date bases: bookings by creation date, completions by recorded completion date, and changes by event date. Responsibility periods do not prove attendance, continuous care or historical productivity. The system does not infer financial results.
-
-Source: [service rules](../../app/services.py), [responsibilities](../../app/responsibilities.py), [fulfilment routes](../architecture/README.md) and [migration 0008](../../alembic/versions/0008_rules.sql).
+Source: [services.py](../../app/services.py), [responsibilities.py](../../app/responsibilities.py), [grooming_routes.py](../../app/grooming_routes.py), [boarding_routes.py](../../app/boarding_routes.py), [0008 rules](../../alembic/versions/0008_rules.sql).

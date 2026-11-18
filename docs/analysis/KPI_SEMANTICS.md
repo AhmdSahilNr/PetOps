@@ -1,12 +1,34 @@
-# Operational Insights: interpreting the numbers
+# Today and Insights: what the numbers mean
 
-| Measure | Meaning / time basis | Limitation |
+All dates use Malaysia time. Each count and its drill-down list come from **one server definition**, so a tile can't disagree with the list behind it.
+
+## Today (Admin operations centre)
+
+| Tile / section | Definition |
+|---|---|
+| Needs decision | Requested bookings, each with readiness flags: needs groomer, needs accommodation, ready to confirm, date passed, changed request |
+| Grooming today | Grooming appointments today |
+| Arrivals today | Confirmed Boarding stays starting today |
+| Departures due | Staying pets planned to check out today or earlier |
+| In care now | Pets currently staying, out of configured places |
+| Coming up | Tomorrow to 7 days ahead, excluding requested and cancelled bookings |
+| Staff work | Open responsibility per Staff member, now and in the next 7 days |
+
+## Insights (selected period)
+
+| Measure | Definition | Limitation |
 |---|---|---|
-| Requests | Bookings created in selected MYT period; type/current status breakdown refers to that cohort | Not demand forecasting or all service dates |
-| Confirmation rate | Confirmation decision events divided by confirmation+rejection decision events in period | Reconfirmed booking can contribute another event; no decisions gives unavailable rate |
-| Completions | Actual Grooming/Boarding completion timestamps in period | Not planned service dates or revenue |
-| Cancellations/reschedules | Recorded change events in period | Not customer satisfaction or unique-customer churn |
-| Physical capacity | Current open Boarding stays against current configured capacity | Not historical utilisation or future bookability |
-| Assigned work | Open unreleased responsibility overlapping period, active Staff only; bookings counted | Not worked hours, attendance, external availability or performance |
+| Booking requests | Bookings **created** in the period | Not service dates or demand forecasts |
+| Completed services | Grooming/Boarding **completion times** in the period | Not revenue |
+| Decision rate | Confirmations ÷ (confirmations + rejections) in the period; "—" when there were none | A reconfirmed booking can add another decision |
+| Cancellations / date changes | Recorded change **events** in the period | Not satisfaction or churn |
+| In care now | Current snapshot of staying pets against capacity | Past occupancy is not reconstructed |
+| Team workload | Open responsibility now and in the next 7 days, counted as distinct bookings | Not hours worked or performance |
 
-Selected period, current physical snapshots and fixed next-seven-day arrivals/departures have distinct labels/bases. Volume buckets reconcile with creation cohorts; empty periods do not invent trend points. Fixture data has a current seed-time bucket, not fabricated history. Read [dashboard.py](../../app/dashboard.py), [overview.js](../../app/static/overview.js) and [final-candidate tests](../../tests/test_final_candidate.py). This is a sanitized explanation of approved captured-data reporting, not new requirements.
+- **Periods:** presets or custom, up to 731 days.
+- **Trends:** zero-filled by day, week or month.
+- **Comparison:** with the previous period of the same length. A percentage is shown only when the earlier value is 10 or more.
+
+Source: [operations.py](../../app/operations.py), [dashboard.py](../../app/dashboard.py) (`/admin/insights/records` returns exactly the counted records), [admin/insights.js](../../app/static/js/admin/insights.js), tests in [test_revamp_2026_11_18.py](../../tests/test_revamp_2026_11_18.py) and [test_final_candidate.py](../../tests/test_final_candidate.py).
+
+Screenshots use fictional data. These definitions describe the system's reporting; they are not business results.

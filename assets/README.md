@@ -1,23 +1,25 @@
-# Interface gallery
+# Interface gallery (final frozen build)
 
-Six original, unretouched captures from the final application candidate e174d81, using fictional demo records. No new runtime capture or participant session is claimed. The Customer/Staff presentation was preserved; final core Insights captures include the r3 status restoration. Counts/dates reflect capture time, not business results or measured usability. Some auxiliary captures preceded the final fixture rebuild; they illustrate their named screens rather than a synchronized database snapshot.
+Ten captures of the final 18 November 2026 interface, using **fictional demonstration data**.
 
-## Customer navigation
-![Customer Home with a clear booking action](screenshots/customer-home-mobile.jpg)
+- **Source:** the existing frozen-build screenshot set, cropped only (no retouching). No interface was changed to produce them.
+- **Content:** counts and dates reflect the moment of capture; they are not business results or usability measurements.
+- **Privacy:** no login credentials, real people, real business data or browser chrome appear.
 
-## Customer booking review
-![Customer reviewing a Grooming request](screenshots/customer-grooming-review-mobile.jpg)
+## Customer
+![Customer Home: next booking, what happens next, pets and updates](screenshots/customer-home-desktop.jpg)
+![Booking journey review step](screenshots/customer-booking-review-desktop.jpg)
+![Customer booking page with progress tracker, stay updates and activity](screenshots/customer-booking-page-desktop.jpg)
+![Customer Home at 375-pixel phone width](screenshots/customer-home-mobile.jpg)
 
-## Staff assigned work
-![Staff My Work showing an assigned Boarding stay](screenshots/staff-work-desktop.jpg)
+## Staff
+![Staff My work with one next action per job](screenshots/staff-my-work-desktop.jpg)
+![Staff My work at 375-pixel phone width](screenshots/staff-my-work-mobile.jpg)
 
-## Admin operational queue
-![Admin Overview and requests needing review](screenshots/admin-overview-desktop.jpg)
+## Admin
+![Admin Today operations centre](screenshots/admin-today-desktop.jpg)
+![Admin review of a Boarding request with checklist and choices](screenshots/admin-booking-review-desktop.jpg)
+![Boarding lodging board by unit and night](screenshots/admin-lodging-board-desktop.jpg)
+![Admin Insights for a selected period](screenshots/admin-insights-desktop.jpg)
 
-## Admin Insights
-![Selected-period operational KPI summaries](screenshots/admin-insights-desktop.jpg)
-
-## Status and responsibility measures
-![Booking status and assigned work with explicit definitions](screenshots/admin-status-and-assigned-work.jpg)
-
-Visible identities and records are fictional. These images contain no login credentials, participant forms, real business data or browser profile chrome. Their source/privacy review is bounded, not a guarantee about all possible metadata. Customer history and detailed Boarding handover can be inspected in the local demo; no missing screenshot was fabricated.
+The tall pages (Today, review, Insights, booking page) show their upper part only.

@@ -1,6 +1,6 @@
 # Business and systems analysis
 
-This sanitized project summary connects operational needs to implemented rules and tests. The underlying FYP requirements/report materials record stakeholder-informed findings and AS-IS/TO-BE analysis. Private interview evidence, organisation identifiers and correspondence remain outside this repository. The summary does not reproduce a confidential transcript or claim new stakeholder validation.
+This sanitized project summary connects operational needs to implemented rules and tests. The underlying FYP requirements/report materials record stakeholder-informed findings and AS-IS/TO-BE analysis. Private interview evidence, participant identities, consent records and correspondence remain outside this repository; the case business is named only as the FYP case study. The summary does not reproduce a confidential transcript or claim new stakeholder validation.
 
 ## From the existing process to the system
 
@@ -29,7 +29,12 @@ The first row summarizes the documented AS-IS Boarding findings. The second desc
 | A handover must preserve previous responsibility | Original/effective periods and attributed events | `test_mid_stay_handover_preserves_history_and_access` in [test_product_simplification.py](../../tests/test_product_simplification.py) |
 | A profile/pet change must not expose another owner's data or erase history | Scoped account APIs and pet archiving | `test_pet_archive_keeps_history_and_ownership` and `test_account_fields_remain_scoped` in [test_product_simplification.py](../../tests/test_product_simplification.py) |
 | Operational changes need consistent history | Transactional events and PostgreSQL triggers | `test_integrated_customer_to_completion_notifications_and_admin_review` in [test_final_hardening.py](../../tests/test_final_hardening.py) |
+| Customers must not receive internal Staff or audit data | Reduced Customer projection in [projections.py](../../app/projections.py) | `test_customer_responses_carry_no_internal_staffing_or_audit_data` in [test_revamp_2026_11_18.py](../../tests/test_revamp_2026_11_18.py) |
+| Former Staff lose access after reassignment or handover, on every route | `staff_scope` in [responsibilities.py](../../app/responsibilities.py) | `test_former_staff_loses_detail_timeline_and_notification_context` in [test_revamp_2026_11_18.py](../../tests/test_revamp_2026_11_18.py); [test_c03_m01_legacy_staff_scope.py](../../tests/test_c03_m01_legacy_staff_scope.py) |
+| A dashboard count must equal its list | One server definition per count in [operations.py](../../app/operations.py) and [dashboard.py](../../app/dashboard.py) | `test_insights_counts_equal_records_and_trend_is_zero_filled` in [test_revamp_2026_11_18.py](../../tests/test_revamp_2026_11_18.py) |
 
-This is a portfolio traceability sample, not a replacement for the full approved FYP requirements matrix. The final394-case collection includes the cited current tests. The [testing record](../testing/README.md) distinguishes execution results from test presence and independent review.
+This is a portfolio traceability sample, not a replacement for the full approved FYP requirements matrix. All cited tests are part of the final 433-test regression. The [testing record](../testing/README.md) separates execution results from test presence and independent review.
 
-Project work covers analysis, workflow/role design, relational modelling, API and interface implementation, and verification. This repository presents the artifacts and decisions for technical review. Human evaluation is complete as bounded qualitative evidence; it does not supply numerical improvement or general-market validation.
+The project work covered analysis, workflow and role design, relational modelling, API and interface implementation, and verification. This repository presents those artifacts and decisions for technical review.
+
+Earlier human feedback was qualitative and was given on a previous version of the interface. It provides no numerical improvement or general-market validation, and the final redesigned interface has not been evaluated with users.

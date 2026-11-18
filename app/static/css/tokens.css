@@ -1,0 +1,77 @@
+/* PetOps design tokens — the single source of colour, type, space, radius and elevation.
+   Concept: "front-desk clarity". White work surfaces, charcoal navigation, restrained burnt-orange
+   actions (student brief), status owns colour, service owns icon, place pips for capacity. */
+:root {
+  /* Neutrals */
+  --ink: #1C1917;           /* text on white 17.5:1 */
+  --ink-2: #44403C;         /* secondary text 10:1 */
+  --muted: #57534E;         /* meta text 7.6:1 */
+  --subtle: #78716C;        /* placeholder / disabled 4.8:1 */
+  --line: #E7E5E4;
+  --line-strong: #D6D3D1;
+  --field-border: #8A847E;  /* 3.7:1 non-text contrast */
+  --canvas: #F5F5F4;
+  --surface: #FFFFFF;
+  --surface-2: #FAFAF9;
+
+  /* Brand + action */
+  --primary: #C2410C;       /* white text 5.2:1 */
+  --primary-hover: #9A3412;
+  --primary-tint: #FFF4EC;
+  --brand: #F06A1E;         /* logo, active bar, today marker, charts only — never text */
+
+  /* Navigation */
+  --nav-bg: #1C1917;
+  --nav-text: #D6D3D1;
+  --nav-muted: #A8A29E;
+  --nav-hover: rgba(255,255,255,.06);
+  --nav-active: rgba(255,255,255,.10);
+
+  /* Semantics */
+  --success: #15803D; --success-bg: #DCFCE7; --success-ink: #166534;
+  --info: #1D4ED8;    --info-bg: #DBEAFE;    --info-ink: #1E40AF;
+  --warning: #B45309; --warning-bg: #FEF3C7; --warning-ink: #92400E;
+  --danger: #B42318;  --danger-bg: #FEE2E2;  --danger-ink: #991B1B;
+  --care: #0F766E;    --care-bg: #CCFBF1;    --care-ink: #115E59;
+  --legacy-bg: #E0E7FF; --legacy-ink: #3730A3;
+  --focus: #2563EB;
+
+  /* Data series — validated with the dataviz palette checker (lightness band, chroma, CVD, contrast: all PASS) */
+  --series-grooming: #EA580C;
+  --series-boarding: #4F46E5;
+  --series-3: #0D9488;
+  --series-4: #A855F7;
+
+  /* Type */
+  --font-display: Bahnschrift, "DIN Alternate", "DIN Next", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-text: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fs-display: 2.25rem;  /* 36 */
+  --fs-h1: 1.75rem;       /* 28 */
+  --fs-h2: 1.375rem;      /* 22 */
+  --fs-h3: 1.125rem;      /* 18 */
+  --fs-body: 1rem;        /* 16 */
+  --fs-small: .875rem;    /* 14 */
+  --fs-tiny: .8125rem;    /* 13 */
+  --lh-tight: 1.2;
+  --lh-body: 1.5;
+
+  /* Space (4px base) */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s7: 32px; --s8: 40px; --s9: 56px;
+
+  /* Radius scales with element size */
+  --r-xs: 6px; --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-pill: 999px;
+
+  /* Elevation (used sparingly: menus, drawers, dialogs) */
+  --shadow-1: 0 1px 2px rgba(28,25,23,.06), 0 4px 12px rgba(28,25,23,.08);
+  --shadow-2: 0 12px 40px rgba(28,25,23,.22);
+
+  /* Layout */
+  --sidebar: 248px;
+  --rail: 72px;
+  --topbar: 64px;
+  --bottombar: 64px;
+  --content-max: 1440px;
+  --customer-max: 1120px;
+
+  --ease: cubic-bezier(.2,.7,.2,1);
+}

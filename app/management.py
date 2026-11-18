@@ -160,7 +160,7 @@ def operational_history(booking_id:UUID,user=Depends(admin),db=Depends(get_db)):
         from .grooming_routes import detail
     else:
         from .boarding_routes import detail
-    return detail(db,b)
+    return detail(db,b,'admin')
 
 
 def locked_booking(db,booking_id):

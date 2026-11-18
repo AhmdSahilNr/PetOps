@@ -1,15 +1,30 @@
-# Known limitations
+# Known limitations (final frozen build)
 
-- Frozen academic baseline with394/394 regression and C03 PASS WITH CONDITIONS; not production readiness/security certification or production least-privilege deployment proof.
-- No fresh-machine installation/deployment or comprehensive recovery certification; local owner setup is for isolated development.
-- No full accessibility, cross-browser or zoom certification. Qualitative human observations do not establish measured improvement/general usability or professional expertise for every explored role.
-- Explicit private database settings are required. Frozen application/Alembic source retain legacy development placeholders; never treat those as usable production credentials.
-- Application tests clear their selected DB. Exact verified disposable identity, not a name suffix, is required.
-- External Staff absence/leave is not an implemented current MUST; generic availability windows are retired eligibility inputs. Occupied-unit transfer is outside scope. Generic BR-013 exceptional active-state override remains deliberately unresolved.
-- Legacy responsibility facts keep only information originally present; absent historical actors or earlier handovers are not reconstructed.
-- Responsibility is planned accountability, not attendance, hours/performance or continuous care. Handover is bounded to now/future within the planned stay.
-- Edit preflight is not a universal atomic conditional-edit protocol.
-- Seeded dates/counts and accelerated care walkthroughs are fictional; trend events occur at actual seed time. IDs/hashes/timestamps vary even when semantic story repeats.
-- Retained Starlette/httpx test-client warning was not addressed by an unrelated dependency upgrade.
-- C03 did not independently rerun PostgreSQL or reverify the earlier populated0007→0008 upgrade from its minimal pack; earlier upgrade evidence remains private.
-- MIT is selected for included project material; public visibility approval remains separate from technical freeze and private push. This curated repository omits private raw research/audit/control evidence.
+These are real limits of the FYP1 build. They are not hidden defects, and they are not work in progress.
+
+## Evidence limits
+
+- **Local academic prototype:** run on a local machine with fictional data. There is no production deployment, hosting, backup/recovery exercise or support process.
+- **No certification:** no security certification, least-privilege production review, formal accessibility certification, broad cross-browser or zoom certification, or verified fresh-machine install.
+- **Human evaluation:**
+  - There was no human user-acceptance testing of the final 18 November redesigned interface.
+  - Earlier qualitative feedback (on a previous version) is descriptive only, with no participant counts, scores or task timings.
+- **Fictional figures:** Insights and Today figures in the screenshots come from fictional data. They are not business results.
+
+## Functional limits
+
+- Notifications are **in-system only**; there is no email, SMS or WhatsApp.
+- There is **no active Grooming handover** once work has started; reassignment happens before work starts only.
+- An **occupied Boarding unit cannot be transferred** to another unit during a stay.
+- There is **no opening-hours model**, so the system does not suggest Grooming time slots; the Customer's preferred time is a request until Admin confirms it.
+- There is **no leave, attendance or shift model**. Staff eligibility is an active account with no overlapping responsibility, and responsibility periods record accountability, not attendance.
+- Insights shows **current occupancy only**; past occupancy is not reconstructed.
+- **Overdue stay** is a display label only: there is no fee, extension or automatic check-out. Its positive case is tested at rule level, because a past-dated open stay can't be created through the API.
+- **Exceptional overrides** after work has started (for example correcting a completed record) need business rules that were not approved, so they are not implemented.
+- Stay updates and groomer notes are **visible to the Customer**; there is no separate internal-notes field.
+- **Legacy compatibility:** old CHECKED_IN/CHECKED_OUT statuses remain readable. The old Staff availability records are kept read-only and do not affect eligibility.
+- The interactive API documentation (`/docs`) is left enabled for local development.
+
+## Out of scope for FYP1
+
+Payment/POS, commission, inventory, payroll, external messaging (WhatsApp/SMS), native mobile application, multi-branch, multi-tenant SaaS, AI chatbot and commercialisation features.

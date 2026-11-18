@@ -27,6 +27,8 @@ from .boarding_routes import router as boarding_router
 from .notifications import router as notification_router, lifespan
 from .management import router as management_router
 from .dashboard import router as dashboard_router
+from .operations import router as operations_router
+from .projections import customer_booking, customer_event
 
 app = FastAPI(title="PetOps Technical Foundation", version="0.1.0", lifespan=lifespan)
 app.include_router(resource_router)
@@ -35,15 +37,41 @@ app.include_router(boarding_router)
 app.include_router(notification_router)
 app.include_router(management_router)
 app.include_router(dashboard_router)
+app.include_router(operations_router)
 STATIC = Path(__file__).with_name("static")
-app.mount("/static", StaticFiles(directory=STATIC), name="static")
+SHELL = Path(__file__).with_name("templates") / "index.html"
+
+
+def compute_asset_version() -> str:
+    """Content hash of every static file: any change to any asset changes the version."""
+    digest = hashlib.sha256()
+    for path in sorted(p for p in STATIC.rglob("*") if p.is_file()):
+        digest.update(path.relative_to(STATIC).as_posix().encode())
+        digest.update(path.read_bytes())
+    return digest.hexdigest()[:12]
+
+
+ASSET_VERSION = compute_asset_version()
+
+
+class RevalidatedStatic(StaticFiles):
+    """Browsers must revalidate (ETag/304) so nested ES-module imports can never be stale."""
+    def file_response(self, *args, **kwargs):
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
+
+
+app.mount("/static", RevalidatedStatic(directory=STATIC), name="static")
 
 
 @app.get("/", include_in_schema=False)
 def demo_page():
-    return FileResponse(STATIC / "index.html", headers={
-        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'",
-        "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
+    html = SHELL.read_text(encoding="utf-8").replace("{{ASSET_VERSION}}", ASSET_VERSION)
+    return Response(content=html, media_type="text/html; charset=utf-8", headers={
+        "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "same-origin"})
 
 
 @app.post("/auth/logout", status_code=204)
@@ -185,13 +213,13 @@ def active_services(db: Session = Depends(get_db), user: User = Depends(get_curr
 @app.post("/bookings", status_code=201)
 def create_customer_booking(payload: BookingCreateIn, user: User = Depends(require_roles(Role.CUSTOMER)), db: Session = Depends(get_db)):
     c = customer_for_user(db, user)
-    return booking_view(create_booking(db, c, user, **payload.model_dump()))
+    return customer_booking(booking_view(create_booking(db, c, user, **payload.model_dump())))
 
 
 @app.get("/bookings")
 def list_customer_bookings(user: User = Depends(require_roles(Role.CUSTOMER)), db: Session = Depends(get_db)):
     c = customer_for_user(db, user)
-    return [booking_view(b) for b in db.scalars(select(Booking).where(Booking.customer_id == c.id).order_by(Booking.created_at.desc())).all()]
+    return [customer_booking(booking_view(b)) for b in db.scalars(select(Booking).where(Booking.customer_id == c.id).order_by(Booking.created_at.desc())).all()]
 
 
 @app.get("/bookings/{booking_id}")
@@ -199,7 +227,7 @@ def get_customer_booking(booking_id: UUID, user: User = Depends(require_roles(Ro
     c = customer_for_user(db, user)
     b = db.scalar(select(Booking).where(Booking.id == booking_id, Booking.customer_id == c.id))
     if not b: raise HTTPException(status_code=404, detail="Booking not found")
-    return booking_view(b)
+    return customer_booking(booking_view(b))
 
 
 @app.post("/bookings/{booking_id}/reschedule")
@@ -207,7 +235,7 @@ def reschedule_customer_booking(booking_id: UUID, payload: RescheduleIn, user: U
     c = customer_for_user(db, user)
     b = db.scalar(select(Booking).where(Booking.id == booking_id, Booking.customer_id == c.id).with_for_update())
     if not b: raise HTTPException(status_code=404, detail="Booking not found")
-    return booking_view(reschedule_booking(db, b, user, **payload.model_dump()))
+    return customer_booking(booking_view(reschedule_booking(db, b, user, **payload.model_dump())))
 
 
 @app.post("/bookings/{booking_id}/cancel")
@@ -215,7 +243,7 @@ def cancel_customer_booking(booking_id: UUID, user: User = Depends(require_roles
     c = customer_for_user(db, user)
     b = db.scalar(select(Booking).where(Booking.id == booking_id, Booking.customer_id == c.id).with_for_update())
     if not b: raise HTTPException(status_code=404, detail="Booking not found")
-    return booking_view(cancel_booking(db, b, user))
+    return customer_booking(booking_view(cancel_booking(db, b, user)))
 
 
 @app.get("/bookings/{booking_id}/history")
@@ -224,12 +252,16 @@ def customer_booking_history(booking_id: UUID, user: User = Depends(require_role
     b = db.scalar(select(Booking).where(Booking.id == booking_id, Booking.customer_id == c.id))
     if not b: raise HTTPException(status_code=404, detail="Booking not found")
     events = db.scalars(select(BookingEvent).where(BookingEvent.booking_id == b.id).order_by(BookingEvent.created_at,BookingEvent.id)).all()
-    return [event_view(e) for e in events]
+    return [customer_event(event_view(e)) for e in events]
 
 
 @app.get("/staff/bookings/{booking_id}")
 def staff_get_assigned_booking(booking_id: UUID, user: User = Depends(require_roles(Role.STAFF)), db: Session = Depends(get_db)):
-    b = db.scalar(select(Booking).where(Booking.id == booking_id, Booking.assigned_staff_user_id == user.id))
+    # C03-M01: same responsibility read scope as the canonical /grooming and /boarding detail routes (PS-03),
+    # not the assignment snapshot, so a currently responsible Staff member keeps read access until a
+    # future-effective handover takes effect. Read-only; mutation authority is unchanged.
+    from .responsibilities import staff_scope
+    b = db.scalar(select(Booking).where(Booking.id == booking_id, staff_scope(user.id)))
     if not b: raise HTTPException(status_code=404, detail="Assigned booking not found")
     return {**booking_view(b), "accommodation_allocations": [allocation_view(a) for a in current_allocations(db, b.id)]}
 

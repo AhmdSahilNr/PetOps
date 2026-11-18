@@ -267,10 +267,13 @@ def test_confirmation_is_blocked_and_rejection_audited(client, seed_base, bookin
     assert r.status_code == 409 and 'BR-002' in r.text
     assert counts() == before
     assert client.post(f"/admin/bookings/{b['id']}/status",headers=bearer(admin),json={'status':'REJECTED'}).status_code == 200
-    h = client.get(f"/bookings/{b['id']}/history",headers=bearer(token)).json()
+    # Actor attribution is audited in the Admin history (2026-11-18 D4); the owner sees the outcome without actor ids.
+    h = client.get(f"/admin/bookings/{b['id']}/history",headers=bearer(admin)).json()['history']
     assert h[-1]['actor_user_id'] == str(seed_base['admin'].id)
     assert (h[-1]['old_status'],h[-1]['new_status']) == ('SUBMITTED','REJECTED')
     assert datetime.fromisoformat(h[-1]['created_at'])
+    mine = client.get(f"/bookings/{b['id']}/history",headers=bearer(token)).json()[-1]
+    assert (mine['old_status'],mine['new_status']) == ('SUBMITTED','REJECTED') and 'actor_user_id' not in mine
 
 
 def test_reschedule_revokes_assignment_and_preserves_previous_staff(client, seed_base, booking_case):
@@ -281,9 +284,10 @@ def test_reschedule_revokes_assignment_and_preserves_previous_staff(client, seed
     staff = login(client,seed_base['staff1'].email,'DemoPass!123')
     assert client.get(f"/staff/bookings/{b['id']}",headers=bearer(staff)).status_code == 200
     r = client.post(f"/bookings/{b['id']}/reschedule",headers=bearer(token),json={'grooming_start':future(5)})
-    assert r.status_code == 200 and r.json()['assigned_staff_user_id'] is None
+    assert r.status_code == 200 and 'assigned_staff_user_id' not in r.json()  # Customer view is minimised (D4)
+    assert client.get(f"/admin/bookings/{b['id']}",headers=bearer(admin)).json()['assigned_staff_user_id'] is None
     assert client.get(f"/staff/bookings/{b['id']}",headers=bearer(staff)).status_code == 404
-    h = client.get(f"/bookings/{b['id']}/history",headers=bearer(token)).json()[-1]
+    h = client.get(f"/admin/bookings/{b['id']}/history",headers=bearer(admin)).json()['history'][-1]
     assert h['old_assigned_staff_user_id'] == str(seed_base['staff1'].id)
     assert h['new_assigned_staff_user_id'] is None
     assert h['old_status'] == 'CONFIRMED' and h['new_status'] == 'SUBMITTED'

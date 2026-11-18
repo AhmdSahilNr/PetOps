@@ -118,9 +118,10 @@ def test_integrated_customer_to_completion_notifications_and_admin_review(case,k
         completed=call(c,'POST',f"/boarding/bookings/{b['id']}/check-out",{},who='staff')
     assert completed['booking']['status']=='COMPLETED'
     assert completed['customer_name']=='Fictional Integrated Customer' and completed['pet_name']=='Fictional Integrated Pet'
-    assert call(c,'GET',f"/{kind.lower()}/bookings/{b['id']}",who='owner')==completed
-    assert call(c,'GET',f"/admin/bookings/{b['id']}/history")==completed
-    assert call(c,'GET',f"/bookings/{b['id']}/history",who='owner')==completed['history']
+    from tests.revamp_views import as_owner_sees, core, owner_history  # 2026-11-18 D4 contract
+    assert core(call(c,'GET',f"/{kind.lower()}/bookings/{b['id']}",who='owner'))==as_owner_sees(completed)
+    assert core(call(c,'GET',f"/admin/bookings/{b['id']}/history"))==core(completed)
+    assert call(c,'GET',f"/bookings/{b['id']}/history",who='owner')==owner_history(completed['history'])
     assert all(e['actor_user_id'] and e['created_at'] for e in completed['history'])
     assert kinds(c)==['BOOKING_SUBMITTED','BOOKING_CONFIRMED','BOOKING_RESCHEDULED','BOOKING_RECONFIRMED']
     d=report(c);assert d['total_bookings']==1 and d['completed_services_by_type'][kind]==1 and d['bookings_by_status']['COMPLETED']==1

@@ -62,7 +62,9 @@ def confirm(c,b,expected=200):
 
 
 def history(c,b):
-    return c['client'].get(f"/bookings/{b['id']}/history",headers=c['owner']).json()
+    # 2026-11-18 revamp (D4): audit details (actors, released resources) are Admin data; Customers get a
+    # minimised history. The audit assertions therefore read the Admin operational history of the same events.
+    return c['client'].get(f"/admin/bookings/{b['id']}/history",headers=c['admin']).json()['history']
 
 
 def configure_unit(c,capacity=1,is_active=True,expected=200):
@@ -238,7 +240,8 @@ def test_reschedule_grooming_rejects_conflict_then_requires_reassignment(case):
     assert c['client'].post(url,headers=c['owner'],json={'grooming_start':(t+timedelta(minutes=30)).isoformat()}).status_code==409
     assert history(c,a)==old
     r=c['client'].post(url,headers=c['owner'],json={'grooming_start':(t+timedelta(hours=2)).isoformat()})
-    assert r.status_code==200 and r.json()['status']=='SUBMITTED' and r.json()['assigned_staff_user_id'] is None
+    assert r.status_code==200 and r.json()['status']=='SUBMITTED' and 'assigned_staff_user_id' not in r.json()  # Customer view minimised (D4)
+    assert c['client'].get(f"/admin/bookings/{a['id']}",headers=c['admin']).json()['assigned_staff_user_id'] is None
     assert history(c,a)[-1]['details']['released_resources']['staff_user_id']==str(c['seed']['staff1'].id)
     confirm(c,a,409); assign(c,r.json()); confirm(c,a)
 

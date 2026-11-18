@@ -72,8 +72,14 @@ def test_boarding_end_to_end_linked_history_and_release(stay):
     for note in (n1,n2):
         event=next(e for e in done['history'] if e['details'] and e['details'].get('boarding_note_id')==note['id'])
         assert event['created_at']==note['created_at'] and event['actor_user_id']==note['actor_user_id']
-    assert c['client'].get(f"/boarding/bookings/{c['b']['id']}",headers=c['owner']).json()==done
-    assert c['client'].get(f"/bookings/{c['b']['id']}/history",headers=c['owner']).json()==done['history']
+    # 2026-11-18 revamp (D4): the owner sees the same booking, stay and notes, minus internal staffing/audit fields.
+    from app.projections import customer_detail, customer_event
+    mine=c['client'].get(f"/boarding/bookings/{c['b']['id']}",headers=c['owner']).json()
+    expected=customer_detail(done); expected.pop('timeline',None); mine_cmp={k:v for k,v in mine.items() if k!='timeline'}
+    assert mine_cmp==expected
+    assert 'responsibilities' not in mine and 'allocation_history' not in mine and 'assigned_staff_user_id' not in mine['booking']
+    assert all(set(n)=={'id','note','created_at'} for n in mine['stay_notes'])
+    assert c['client'].get(f"/bookings/{c['b']['id']}/history",headers=c['owner']).json()==[customer_event(e) for e in done['history']]
 
 
 def test_boarding_without_staff_is_admin_operated(case):
@@ -107,7 +113,9 @@ def test_work_is_scoped_and_customer_visible(stay):
         assert c['client'].get(f"/boarding/bookings/{c['b']['id']}",headers=headers).status_code==404
     for who in ('owner','staff','admin'):
         d=c['client'].get(f"/boarding/bookings/{c['b']['id']}",headers=c[who]).json()
-        assert d['pet_name']=='Milo' and d['customer_name']=='Customer One' and d['allocation_history']
+        assert d['pet_name']=='Milo' and d['customer_name']=='Customer One'
+        # 2026-11-18 (D4): Staff/Admin see the allocation; the owner's view omits internal allocation history.
+        assert ('allocation_history' in d)==(who!='owner') and (who=='owner' or d['allocation_history'])
         assert 'password_hash' not in str(d)
     for who in ('owner','staff','other_staff'):
         assert c['client'].get('/boarding/staff-options',headers=c[who]).status_code==403

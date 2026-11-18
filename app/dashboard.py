@@ -8,7 +8,7 @@ from .availability import ACTIVE_WORK
 from .database import get_engine
 from .management import period_bounds
 from .models import (Accommodation,BoardingAllocation,BoardingStay,Booking,BookingEvent,
-    BookingStatus,GroomingRecord,Role,ServiceType,StaffResponsibility,User,utcnow)
+    BookingStatus,GroomingRecord,Role,Service,ServiceType,StaffResponsibility,User,utcnow)
 from .security import require_roles
 from .services import business_today,utc_iso
 from .views import booking_view
@@ -108,6 +108,120 @@ def report(db,start,end):
             'omissions':'No revenue, profitability, cancellation-reason analysis or invented historical capacity utilisation.'}}
 
 
+def bucket_plan(start,end):
+    """Zero-filled buckets: day up to 31 days, MYT Monday week up to 93 days, otherwise calendar month."""
+    days=(end-start).days+1
+    if days>731:return None  # trends are offered for periods of up to two years
+    size='day' if days<=31 else 'week' if days<=93 else 'month'
+    def key(d):
+        if size=='day':return d
+        if size=='week':return d-timedelta(days=d.weekday())
+        return d.replace(day=1)
+    keys=[];k=key(start)
+    while k<=end:
+        keys.append(k)
+        if size=='day':k+=timedelta(days=1)
+        elif size=='week':k+=timedelta(days=7)
+        else:k=(k.replace(day=28)+timedelta(days=4)).replace(day=1)
+    return size,key,keys
+
+
+def myt_date(value):
+    from zoneinfo import ZoneInfo
+    from .availability import aware
+    return aware(value).astimezone(ZoneInfo('Asia/Kuala_Lumpur')).date()
+
+
+def metric_rows(db,metric,lo,hi):
+    """(booking, instant) pairs for a period metric; the single definition used by counts, trends and drill-downs."""
+    if metric=='created':
+        return [(b,b.created_at) for b in db.scalars(select(Booking).where(Booking.created_at>=lo,Booking.created_at<hi).order_by(Booking.created_at,Booking.id))]
+    if metric=='completed':
+        out=[]
+        for model in (GroomingRecord,BoardingStay):
+            for r in db.scalars(select(model).where(model.completed_at>=lo,model.completed_at<hi)):
+                out.append((db.get(Booking,r.booking_id),r.completed_at))
+        return sorted(out,key=lambda p:(p[1],str(p[0].id)))
+    events={'cancellations':('BOOKING_CANCELLED',None),'reschedules':('BOOKING_RESCHEDULED',None),
+        'decisions_confirmed':('STATUS_CHANGED',BookingStatus.CONFIRMED),'decisions_rejected':('STATUS_CHANGED',BookingStatus.REJECTED)}
+    if metric not in events:raise ValueError(metric)
+    kind,status=events[metric]
+    q=select(BookingEvent).where(BookingEvent.event_type==kind,BookingEvent.created_at>=lo,BookingEvent.created_at<hi)
+    if status is not None:q=q.where(BookingEvent.new_status==status)
+    return [(db.get(Booking,e.booking_id),e.created_at) for e in db.scalars(q.order_by(BookingEvent.created_at,BookingEvent.id))]
+
+
+def period_totals(db,start,end):
+    lo,hi=period_bounds(start,end)
+    created=metric_rows(db,'created',lo,hi);completed=metric_rows(db,'completed',lo,hi)
+    confirmed=len(metric_rows(db,'decisions_confirmed',lo,hi));rejected=len(metric_rows(db,'decisions_rejected',lo,hi))
+    reschedules=metric_rows(db,'reschedules',lo,hi)
+    return {'from_date':start.isoformat(),'to_date':end.isoformat(),'bookings_created':len(created),
+        'completed_services':len(completed),'cancellations':len(metric_rows(db,'cancellations',lo,hi)),
+        'reschedules':len(reschedules),'rescheduled_bookings':len({b.id for b,_ in reschedules}),
+        'decisions':confirmed+rejected,'decision_rate_percent':round(confirmed*100/(confirmed+rejected),2) if confirmed+rejected else None}
+
+
+def revamp_measures(db,start,end):
+    """Additive Insights 2.0 keys; existing keys are untouched."""
+    lo,hi=period_bounds(start,end)
+    plan=bucket_plan(start,end)
+    trend=None
+    if plan:
+        size,key,keys=plan
+        series={k:{'period_start':k.isoformat(),'created_grooming':0,'created_boarding':0,'completed_grooming':0,
+            'completed_boarding':0,'cancellations':0,'reschedules':0} for k in keys}
+        for metric,field in (('created','created'),('completed','completed'),('cancellations','cancellations'),('reschedules','reschedules')):
+            for b,instant in metric_rows(db,metric,lo,hi):
+                bucket=series[key(myt_date(instant))]
+                if field in ('created','completed'):bucket[f"{field}_{b.booking_type.value.lower()}"]+=1
+                else:bucket[field]+=1
+        trend={'bucket_size':size,'zero_filled':True,'buckets':list(series.values())}
+    by_service={}
+    for b,_ in metric_rows(db,'completed',lo,hi):
+        s=db.get(Service,b.service_id);entry=by_service.setdefault(str(s.id),{'service_id':str(s.id),'name':s.name,'service_type':s.service_type.value,'completed':0})
+        entry['completed']+=1
+    from fastapi import HTTPException
+    current=period_totals(db,start,end)
+    length=(end-start).days+1
+    try:
+        prev_end=start-timedelta(days=1);prev_start=prev_end-timedelta(days=length-1)
+        previous=period_totals(db,prev_start,prev_end)
+    except (OverflowError,HTTPException):
+        previous=None
+    return {'trend':trend,
+        'completed_by_service':sorted(by_service.values(),key=lambda r:(r['service_type'],-r['completed'],r['name'])),
+        'period_totals':current,'previous_period':previous,
+        'period_complete':end<business_today(),
+        'revamp_definitions':{'trend':'Zero-filled MYT buckets (day up to 31 days, Monday week up to 93 days, otherwise month): bookings created by type (creation time), completed services by type (actual completion time), cancellation and reschedule events (event time).',
+            'previous_period':'Same measures for the equal-length window immediately before the selected period. Percentage change is shown only when the previous value is at least 10.',
+            'rescheduled_bookings':'Distinct bookings with at least one reschedule event in the period (reschedules counts every action).',
+            'records':'GET /admin/insights/records?metric=… returns exactly the records counted by each period measure.'}}
+
+
+RECORD_METRICS=('created','completed','cancellations','reschedules','decisions_confirmed','decisions_rejected')
+
+
+@router.get('/insights/records')
+def insight_records(metric:str,from_date:date,to_date:date,service_type:ServiceType|None=None,status:BookingStatus|None=None,
+        user=Depends(require_roles(Role.ADMIN))):
+    from fastapi import HTTPException
+    from .models import Customer,Pet
+    if metric not in RECORD_METRICS:raise HTTPException(422,'Unknown Insights measure')
+    if status is not None and metric!='created':raise HTTPException(422,'Status filter applies to bookings created in the period')
+    lo,hi=period_bounds(from_date,to_date)
+    with get_engine().connect().execution_options(isolation_level='REPEATABLE READ') as connection:
+        with Session(connection) as db:
+            db.execute(text('SET TRANSACTION READ ONLY'))
+            pairs=metric_rows(db,metric,lo,hi)
+            if service_type is not None:pairs=[p for p in pairs if p[0].booking_type==service_type]
+            if status is not None:
+                pairs=[p for p in pairs if p[0].status==status]  # exact current status: matches bookings_by_status
+            items=[{**booking_view(b),'counted_at':utc_iso(t),'pet_name':db.get(Pet,b.pet_id).name,
+                'customer_name':db.get(Customer,b.customer_id).display_name,'service_name':db.get(Service,b.service_id).name} for b,t in pairs]
+            return {'metric':metric,'from_date':from_date.isoformat(),'to_date':to_date.isoformat(),'total':len(items),'items':items}
+
+
 @router.get('/dashboard')
 def dashboard(from_date:date,to_date:date,user=Depends(require_roles(Role.ADMIN))):
     period_bounds(from_date,to_date)
@@ -115,4 +229,4 @@ def dashboard(from_date:date,to_date:date,user=Depends(require_roles(Role.ADMIN)
     with get_engine().connect().execution_options(isolation_level='REPEATABLE READ') as connection:
         with Session(connection) as db:
             db.execute(text('SET TRANSACTION READ ONLY'))
-            return report(db,from_date,to_date)
+            return {**report(db,from_date,to_date),**revamp_measures(db,from_date,to_date)}

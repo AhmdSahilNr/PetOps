@@ -52,29 +52,49 @@ def note_view(n):
         "note":n.note,"actor_user_id":str(n.actor_user_id),"created_at":utc_iso(n.created_at)}
 
 
-def detail(db,b):
+def detail(db,b,audience=None):
     s=db.scalar(select(BoardingStay).where(BoardingStay.booking_id==b.id))
     notes=db.scalars(select(BoardingNote).where(BoardingNote.stay_id==s.id).order_by(BoardingNote.created_at,BoardingNote.id)).all() if s else []
     events=db.scalars(select(BookingEvent).where(BookingEvent.booking_id==b.id).order_by(BookingEvent.created_at,BookingEvent.id)).all()
     allocations=db.scalars(select(BoardingAllocation).where(BoardingAllocation.booking_id==b.id).order_by(BoardingAllocation.created_at)).all()
     from .responsibilities import rows_for,view
-    return {"responsibilities":[view(db,row) for row in rows_for(db,b.id)],"booking":booking_view(b),"customer_name":db.get(Customer,b.customer_id).display_name,
+    out={"responsibilities":[view(db,row) for row in rows_for(db,b.id)],"booking":booking_view(b),"customer_name":db.get(Customer,b.customer_id).display_name,
         "pet_name":db.get(Pet,b.pet_id).name,"service_name":db.get(Service,b.service_id).name,
         "boarding_stay":stay_view(s),"stay_notes":[note_view(n) for n in notes],
         "allocation_history":[{**allocation_view(a),"name":db.get(Accommodation,a.accommodation_id).name,
             "released_by_user_id":str(a.released_by_user_id) if a.released_by_user_id else None} for a in allocations],
         "history":[event_view(e) for e in events]}
+    if audience:
+        from .timeline import build,current_accommodation_name
+        out["timeline"]=build(db,b,audience)
+        if audience!='customer':out["accommodation_name"]=current_accommodation_name(db,b.id)
+    return out
+
+
+def audience_for(user):
+    return {Role.CUSTOMER:'customer',Role.STAFF:'staff',Role.ADMIN:'admin'}[user.role]
 
 
 @router.get("/bookings")
 def work_list(user:User=Depends(get_current_user),db:Session=Depends(get_db)):
-    return [{**booking_view(b),"pet_name":db.get(Pet,b.pet_id).name,"service_name":db.get(Service,b.service_id).name,"customer_name":db.get(Customer,b.customer_id).display_name}
+    out=[{**booking_view(b),"pet_name":db.get(Pet,b.pet_id).name,"service_name":db.get(Service,b.service_id).name,"customer_name":db.get(Customer,b.customer_id).display_name}
         for b in db.scalars(scoped_query(db,user).order_by(Booking.created_at.desc()))]
+    if user.role==Role.CUSTOMER:
+        from .projections import customer_booking
+        out=[customer_booking(row) for row in out]
+    else:
+        from .timeline import current_accommodation_name
+        for row in out:row["accommodation_name"]=current_accommodation_name(db,row["id"])
+    return out
 
 
 @router.get("/bookings/{booking_id}")
 def work_detail(booking_id:UUID,user:User=Depends(get_current_user),db:Session=Depends(get_db)):
-    return detail(db,find_work(db,user,booking_id))
+    out=detail(db,find_work(db,user,booking_id),audience_for(user))
+    if user.role==Role.CUSTOMER:
+        from .projections import customer_detail
+        out=customer_detail(out)
+    return out
 
 
 @router.get("/staff-options")

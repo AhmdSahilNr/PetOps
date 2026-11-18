@@ -1,0 +1,15 @@
+// Real HTTP/browser smoke for Batch 1; existing fictional accounts only, no seed or booking mutation.
+const {chromium}=require('C:/Users/User/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const fs=require('fs'),path=require('path'),assert=require('assert/strict');
+const out=path.resolve(__dirname,'../docs/evidence/uiux/batch1');fs.mkdirSync(out,{recursive:true});
+(async()=>{const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});const results=[];
+try{for(const role of ['customer','staff','admin']){const context=await browser.newContext({viewport:{width:1440,height:900}}),page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto('http://127.0.0.1:58090/');await page.locator('#login input[name=email]').fill(role+'.demo@petops.example');await page.locator('#login input[name=password]').fill('DemoPass!123');await page.locator('#login button').click();await page.locator('body.authenticated').waitFor().catch(async e=>{await page.screenshot({path:path.join(out,'failure.png'),fullPage:true});console.log(JSON.stringify({errors,message:await page.locator('#message').textContent()}));throw e;});await page.locator('#active-list').waitFor();
+await page.locator('#nav-boarding').click();await page.waitForFunction(()=>document.querySelector('#nav-boarding').getAttribute('aria-current')==='page');
+await page.screenshot({path:path.join(out,role+'-desktop.png'),fullPage:true});
+for(const width of [320,390,768,1024,1366,1440,1920]){await page.setViewportSize({width,height:900});const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth);assert(!overflow,role+' overflow '+width);
+if(width<1024){await page.getByRole('button',{name:'Menu',exact:true}).click();await page.getByRole('button',{name:'Close menu',exact:true}).waitFor({state:'visible'});assert(await page.locator('main').evaluate(n=>n.inert));await page.keyboard.press('Shift+Tab');assert(await page.locator('#app-navigation button:visible').last().evaluate(n=>n===document.activeElement));await page.keyboard.press('Escape');assert(await page.getByRole('button',{name:'Menu',exact:true}).evaluate(n=>n===document.activeElement));}
+results.push({role,width,horizontal_overflow:overflow,menu_keyboard_checked:width<1024});}
+await page.setViewportSize({width:390,height:844});await page.screenshot({path:path.join(out,role+'-mobile.png'),fullPage:true});await page.locator('#logout').click();await page.locator('#auth').waitFor({state:'visible'});assert(await page.locator('#app-navigation').isHidden());assert.deepEqual(errors,[]);await context.close();}
+fs.writeFileSync(path.join(out,'browser-results.json'),JSON.stringify({scope:'Batch 1 shell over actual PostgreSQL app; role sign-in, navigation, responsive Menu, focus trap/Escape/return, logout; no booking lifecycle mutation',results},null,2));console.log('21 real application role/width checks; sign-in/navigation/menu/logout succeeded.');}finally{await browser.close();}})().catch(e=>{console.error(e);process.exit(1)});
+

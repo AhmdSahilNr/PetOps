@@ -32,12 +32,12 @@ The helper also creates Staff Aisyah Rahman/Amir Hakim and Customers Mei Ling/Ar
 | Time | Show / explain |
 |---|---|
 |0:00–0:30|Business problem: connected booking, capacity, responsibility and service history rather than scattered reservations/remarks.|
-|0:30–1:10|Customer Home → Book a service → owned pet/service/schedule → review. Explain Admin confirmation; avoid creating an extra request unless deliberately demonstrating mutation on your disposable fixture.|
-|1:10–1:50|Admin Overview/Bookings → request detail → prepare Staff/accommodation → confirm/reject. Availability is PetOps conflicts/capacity, not employee attendance.|
-|1:50–2:30|Staff My Work → assigned Boarding stay/detail. Show care/history and bounded responsibility; future assignee cannot act early.|
-|2:30–3:10|Existing completed Grooming/Boarding records and event/responsibility history. Explain Check In→Staying→Check Out→Completed and preserved original handover plan; do not fake elapsed care.|
-|3:10–4:00|Admin Insights: selected period, requests, decision-based confirmation rate, actual completions, current capacity and assigned work. Explain their different date bases.|
-|4:00–4:30|394/394 final regression and independent PASS WITH CONDITIONS; qualitative human observations; production/security/accessibility/fresh-machine limits.|
+|0:30–1:10|Customer Home → Book a service (Type, Pet, Service, Date and time, Review). Explain that the time is a request until Admin confirms. Don't create an extra request unless you are deliberately demonstrating on your own disposable fixture.|
+|1:10–1:50|Admin Today → Needs decision → open a request → review checklist → choose a groomer, or accommodation plus optional Staff → one Confirm action (or reject). Eligibility is PetOps workload and capacity, not attendance.|
+|1:50–2:30|Staff My work → one next action per job → open a Boarding job (stay progress, stay updates, responsibility). A scheduled future assignee can view the job but can't act early.|
+|2:30–3:10|Boarding lodging board and booking history. Explain Check in → Staying → Check out → Completed, the handover record, and the Overdue stay label (display only). Don't fake elapsed care.|
+|3:10–4:00|Admin Insights: selected period compared with the previous one; requests by creation date, decision rate, completions, current occupancy, team workload. Each tile opens its records.|
+|4:00–4:30|Verification: 433/0 PostgreSQL regression, 13/13 end-to-end, and the independent review that passed after one corrected finding. State the limits: no human evaluation of this interface, no production or security certification.|
 
 Use separate browser sessions if showing roles side by side, or log out before changing roles. Counts change if you perform real actions; never claim a stale screenshot is a live query. Older fixture dates need deliberate regeneration of your own disposable fixture for a later day.
 

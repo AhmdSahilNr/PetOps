@@ -56,9 +56,10 @@ def test_grooming_end_to_end_linked_history(work):
     assert datetime.fromisoformat(r['started_at']).tzinfo is not None
     events=completed['history']; assert [e['event_type'] for e in events][-2:]==['GROOMING_STARTED','GROOMING_COMPLETED']
     assert events[-2]['created_at']==r['started_at'] and events[-1]['created_at']==r['completed_at']
-    assert completed==c['client'].get(f"/grooming/bookings/{b['id']}",headers=c['owner']).json()
+    from tests.revamp_views import as_owner_sees, core, owner_history  # 2026-11-18 D4 contract
+    assert as_owner_sees(completed)==core(c['client'].get(f"/grooming/bookings/{b['id']}",headers=c['owner']).json())
     assert c['client'].get(f"/bookings/{b['id']}",headers=c['owner']).json()['status']=='COMPLETED'
-    assert c['client'].get(f"/bookings/{b['id']}/history",headers=c['owner']).json()==events
+    assert c['client'].get(f"/bookings/{b['id']}/history",headers=c['owner']).json()==owner_history(events)
     assert c['client'].get('/grooming/bookings',headers=c['owner']).json()[0]['status']=='COMPLETED'
 
 

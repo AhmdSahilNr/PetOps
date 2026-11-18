@@ -1,6 +1,17 @@
 # Database model
 
-This is a simplified portfolio ERD derived from [SQLAlchemy models](../../app/models.py) and the retained [migrations](../../alembic/versions). It omits secondary actor links, configuration tables, legacy compatibility fields and some attributes. It does not replace the actual schema.
+The final schema has **17 application tables (149 fields)** at Alembic migration head **0008**:
+
+- **Accounts and pets:** users, user_sessions, customers, pets.
+- **Bookings and services:** services, bookings.
+- **Staffing:** staff_responsibilities, staff_availability (legacy, read-only).
+- **History and service records:** booking_events, grooming_records, boarding_stays, boarding_notes.
+- **Accommodation:** accommodations, boarding_allocations.
+- **Notifications and configuration:** notification_settings, notifications, management_events.
+
+Foreign keys use `ON DELETE RESTRICT`, except for sessions. The final redesign did not change the schema.
+
+The diagram below is a simplified portfolio ERD derived from [SQLAlchemy models](../../app/models.py) and the retained [migrations](../../alembic/versions). It omits secondary actor links, configuration tables, legacy compatibility fields and some attributes. It does not replace the actual schema.
 
 ```mermaid
 erDiagram
