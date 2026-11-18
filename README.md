@@ -1,155 +1,221 @@
 # PetOps
 
-PetOps is a web-based **Grooming and Boarding booking and management system** for three roles: **Customer, Staff and Admin**. It was developed as my Final Year Project (FYP1, Bachelor of IT (Information Systems), Universiti Tenaga Nasional), using the RS Pet House case study.
+**A web-based Grooming and Boarding booking and operations management system, built as a Final Year Project case study at Universiti Tenaga Nasional (UNITEN).**
 
-It is an **academic prototype that runs locally with fictional data**. It is not a deployed or commercial service.
+PetOps connects everything a small pet-care business needs to run Grooming appointments and Boarding stays: Customer requests, pet records, Admin review, Staff responsibility, accommodation capacity, day-to-day operations and history. Three roles, **Customer, Staff and Admin**, each get their own view of the same records.
 
-[Walkthrough](demo/README.md) · [Local setup](docs/developer/SETUP.md) · [Workflows](docs/workflows/README.md) · [Architecture](docs/architecture/README.md) · [Database](docs/database/README.md) · [Insights definitions](docs/analysis/KPI_SEMANTICS.md) · [Testing](docs/testing/README.md) · [Limitations](docs/testing/LIMITATIONS.md) · [Release identity](docs/RELEASE.md)
+> Academic prototype. It runs locally with fictional data and is not a deployed or commercial service.
 
-## Why it exists
+[Case study](#the-problem) · [Screenshots](#what-it-looks-like) · [How it works](#how-the-system-works) · [Architecture](#architecture) · [Testing](#testing) · [Run it locally](#run-it-locally) · [Limitations](#scope-and-limitations)
 
-At the case business, advance Boarding reservations and cage availability were handled by hand, while Customer, pet and stay details sat in a separate record application. PetOps connects these steps in one structured record: the request, resource preparation, service work and retained history.
+![Customer Home](assets/screenshots/customer-home.jpg)
 
-## Final frozen build
+## Key capabilities
 
 | | |
 |---|---|
-| Services | Grooming, Boarding |
-| Roles | Customer, Staff, Admin |
-| Database | PostgreSQL, Alembic migration head `0008`, 17 application tables |
-| Automated regression | **433 passed / 0 failed** on PostgreSQL 18.6 (plus 4 nested subtests; 1 pre-existing dependency warning) |
-| Browser end-to-end checks | **13 / 13 passed** |
-| Independent technical review | Passed with one condition; the condition was corrected and closed on re-review |
-| Frozen source identity | 146 source files, SHA-256 `1fd06edf1788176a09d9c3d93c3a28413a55a006f53f6210652fd14087048e70` ([details](docs/RELEASE.md)) |
+| **Customer booking journey** | Five steps (type, pet, service, date and time, review), with an availability check. The request is confirmed by Admin, not automatically |
+| **Admin operations** | A Today view of what needs a decision, a review workspace, a Boarding lodging board of capacity per night, Staff workload and period Insights |
+| **Staff work** | Each Staff member sees only the jobs they are responsible for, with one clear next action per job |
+| **Boarding capacity** | Accommodation is allocated against a limit on every night of a stay and released at check-out |
+| **Responsibility and handover** | Staff accountability is recorded over time, and access follows it, including handover during a stay |
+| **History** | Each booking action is recorded as an event with who did it and when; past responsibility periods stay on record |
+| **Verified** | 433 automated PostgreSQL tests passed (0 failed); 13 of 13 browser workflows passed; independent technical review closed |
 
-These are **technical verification results**. They are not human user-acceptance testing, usability measurement or production certification.
+## The problem
 
-## Screenshots (fictional data)
+The case business took Boarding reservations and checked cage availability by hand, while Customer, pet and stay details lived separately in a basic record application. The information needed to accept a booking, prepare a place and follow the stay was split across manual and digital records. Staff updates were reviewed by the owner, but there was no structured record of who was responsible for each booking.
 
-<table>
-<tr>
-<td width="50%" align="center"><img src="assets/screenshots/customer-home-desktop.jpg" width="420" alt="Customer Home showing the next booking and what happens next"><br><strong>Customer Home</strong><br>Next booking, what happens next, pets and updates.</td>
-<td width="50%" align="center"><img src="assets/screenshots/customer-booking-review-desktop.jpg" width="420" alt="Review step of the five-step booking journey"><br><strong>Booking journey</strong><br>Type, Pet, Service, Date and time, Review.</td>
-</tr>
-<tr>
-<td align="center"><img src="assets/screenshots/staff-my-work-desktop.jpg" width="420" alt="Staff My work with one next action per job"><br><strong>Staff: My work</strong><br>Own jobs only, one next action each.</td>
-<td align="center"><img src="assets/screenshots/admin-today-desktop.jpg" width="420" alt="Admin Today operations centre"><br><strong>Admin: Today</strong><br>Needs decision, today's work, capacity, Staff workload.</td>
-</tr>
-<tr>
-<td align="center"><img src="assets/screenshots/admin-lodging-board-desktop.jpg" width="420" alt="Boarding lodging board by unit and night"><br><strong>Admin: Boarding lodging board</strong><br>Reserved places per unit and night.</td>
-<td align="center"><img src="assets/screenshots/admin-insights-desktop.jpg" width="420" alt="Admin Insights for a selected period"><br><strong>Admin: Insights</strong><br>Period measures with comparison and drill-down.</td>
-</tr>
-<tr>
-<td align="center"><img src="assets/screenshots/customer-home-mobile.jpg" width="200" alt="Customer Home at phone width"><br><strong>Phone width (375 px)</strong></td>
-<td align="center"><img src="assets/screenshots/staff-my-work-mobile.jpg" width="200" alt="Staff My work at phone width"><br><strong>Phone width (375 px)</strong></td>
-</tr>
-</table>
+**Product approach:** one system that carries each booking from request to history:
 
-[Full gallery and capture notes](assets/README.md)
+```mermaid
+flowchart LR
+    A[Customer request] --> B[Admin review and resource preparation]
+    B --> C[Confirmed booking]
+    C --> D[Staff fulfilment or stay]
+    D --> E[Completed, with full history]
+    E --> F[Admin review: Today and Insights]
+```
 
-## Core workflow
+**Key design decisions**
 
-Customer account and profile → pet → choose Grooming or Boarding → availability or capacity check → booking request → Admin review and resource preparation → confirm or reject → in-system notification → permitted reschedule or cancel → Grooming fulfilment, or Boarding check-in, stay and check-out → completion → history and Admin operational review.
+- **Customers see only their own records.** Internal Staff and audit details are not sent to them.
+- **Admin prepares resources before confirming.** A Grooming booking needs an eligible groomer; a Boarding booking needs a place on every night.
+- **Staff access follows responsibility, not the role alone.** A former Staff member loses access after a handover.
+- **The Customer requests dates; Admin chooses the accommodation.** Capacity is checked on the server.
+- **History is preserved.** Booking actions are recorded as events with their actor and time, and inactive services or archived pets stay in history.
+- **Notifications are in-system only.** There is no email, SMS or WhatsApp.
 
-### Grooming
+## What it looks like
 
-Requested → Admin assigns an eligible groomer and confirms → Confirmed → responsible Staff starts → In progress → completes, with optional notes → Completed.
+All screenshots show the final interface with **fictional data**.
 
-- **Eligible groomer:** an active Staff account with no overlapping responsibility. The review page does this in one Confirm action.
-- **Confirmation:** requires a start time that has not passed.
-- **Reassignment:** possible before work starts. There is no handover once work is in progress.
+**Customer**
 
-### Boarding
-
-Requested → Admin allocates accommodation with a free place on **every** night of the stay and confirms → Confirmed → check-in within the reserved dates → Staying → attributed stay updates → check-out → Completed. Check-out also releases the place.
-
-- **Staff responsibility is optional.** Admin handles an unassigned stay.
-- **Handover:** during an active stay, Admin can hand over responsibility at an effective time. The previous period is kept.
-- **Overdue stays:** a stay still open after its planned check-out is labelled **Overdue stay** for visibility only. It keeps its place until check-out.
-
-### Reschedule and cancel
-
-- **When:** only while a booking is Requested or Confirmed, by the Customer or Admin.
-- **Reschedule:** returns the booking to Requested and releases the prepared groomer or place, so a new confirmation must re-check resources.
-- **Cancel:** releases resources.
-
-## Roles and access
-
-| Role | Main tasks |
+| Book a service: choose the type | Review the request |
 |---|---|
-| **Customer** | Own profile and pets, booking journey, own bookings with progress and history, notifications, permitted changes |
-| **Staff** | My work, read-only Agenda of own responsibility periods, job pages, Grooming start/complete, Boarding check-in/stay update/check-out, notifications |
-| **Admin** | Today, Bookings, Boarding board, Staff work, History, Insights. Settings: Services, Staff accounts, Boarding setup, Reminders, Change log |
+| ![Booking type step](assets/screenshots/customer-booking-type.jpg) | ![Booking review step](assets/screenshots/customer-booking-review.jpg) |
 
-Access model, enforced **on the server** (menus are presentation only):
+| Follow the booking: progress, stay updates and activity |
+|---|
+| ![Customer booking status page](assets/screenshots/customer-booking-status.jpg) |
 
-- **Authentication:** passwords stored as hashes; server-side sessions that expire; logout revokes the session.
-- **Role checks:** every route checks the role, and a route-inventory test guards new routes.
-- **Customer ownership:** a Customer reaches only their own pets and bookings; anything else returns 404.
-- **Customer privacy:** Customer responses are reduced. Internal Staff identities and audit fields are not sent, and the Customer timeline says "You" and "PetOps".
-- **Staff read access:** a Staff member can read a booking while holding an unreleased responsibility for it.
-- **Staff write access:** only the currently responsible Staff member can act. After a reassignment or handover, the former Staff member loses access and their old notifications are redacted.
-- **Admin authority:** operational and configuration functions. Admin fulfilment is a disclosed fallback.
-- **History:** every booking action is recorded with its actor and time. Referenced records cannot be deleted.
+**Staff**
 
-This describes the design and its tests. **It is not a security certification.**
+| My work: one next action per job | Boarding job: stay progress and responsibility |
+|---|---|
+| ![Staff My work](assets/screenshots/staff-my-work.jpg) | ![Staff Boarding job page](assets/screenshots/staff-boarding-job.jpg) |
 
-## Today and Insights
+**Admin**
 
-- **Today** is the Admin operations centre: what needs a decision, Grooming today, arrivals, departures due, pets in care, the coming week, Staff open work and capacity now. Each tile opens exactly the records it counts.
-- **Insights** reports a selected period, compared with the previous period of the same length:
-  - requests, by creation date;
-  - completed services, by completion time;
-  - decision rate, meaning confirmed ÷ (confirmed + rejected) decisions;
-  - cancellations and date changes, by event time;
-  - current occupancy;
-  - trends, service mix and team workload.
+| Today: what needs attention | Reviewing a Boarding request |
+|---|---|
+| ![Admin Today](assets/screenshots/admin-today.jpg) | ![Admin booking review](assets/screenshots/admin-booking-review.jpg) |
 
-Business time is Malaysia time. Values in the screenshots are fictional and are **not business results**. See [Insights definitions](docs/analysis/KPI_SEMANTICS.md).
+| Boarding lodging board: places per unit and night | Insights: a selected period, with drill-down |
+|---|---|
+| ![Lodging board](assets/screenshots/admin-lodging-board.jpg) | ![Insights](assets/screenshots/admin-insights.jpg) |
+
+## Roles
+
+| Role | What they do | What they cannot do |
+|---|---|---|
+| **Customer** | Register, manage pets, book Grooming or Boarding, follow progress, change dates or cancel before work starts, read notifications | See anyone else's data; choose the accommodation unit |
+| **Staff** | See their own work and agenda; start and complete Grooming; check in, add stay updates, check out | Confirm bookings, allocate resources or change settings; open work no longer assigned to them |
+| **Admin** | Review and confirm or reject, assign groomers, allocate accommodation, hand over responsibility, monitor Today and Insights, manage services, Staff accounts, units and reminders | Create bookings for Customers |
+
+## How the system works
+
+**Grooming:** an appointment with one responsible groomer.
+
+```mermaid
+flowchart LR
+    R[Customer requests a time] --> A[Admin assigns an eligible groomer]
+    A --> C[Confirmed]
+    C --> S[Responsible Staff starts: In progress]
+    S --> D[Completed, with optional notes]
+```
+
+**Boarding:** a stay over several nights, in a unit with limited places.
+
+```mermaid
+flowchart LR
+    R[Customer requests dates] --> A[Admin allocates a unit with a free place every night, plus optional Staff]
+    A --> C[Confirmed]
+    C --> I[Check-in: Staying]
+    I --> U[Stay updates]
+    U --> O[Check-out: Completed, place released]
+```
+
+**Changes:** dates can be changed, or a booking cancelled, only while it is Requested or Confirmed. A date change sends the booking back to Requested and releases the groomer or place, so Admin confirms it again. A stay that runs past its planned check-out is labelled *Overdue stay* for visibility only.
+
+Full rules: [workflows](docs/workflows/README.md) · [Insights definitions](docs/analysis/KPI_SEMANTICS.md)
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    Browser["Browser: HTML, CSS, JavaScript ES modules<br>Customer portal / Staff and Admin workspaces"] -->|HTTP + JSON, session cookie| API["FastAPI<br>authentication, RBAC, validation, business rules"]
-    API --> ORM[SQLAlchemy ORM, transactions]
-    ORM --> DB[(PostgreSQL<br>keys, constraints, triggers)]
-    Alembic[Alembic migrations 0001-0008] --> DB
+    Browser["Browser<br/>HTML · CSS · JavaScript<br/>Customer, Staff and Admin views"] -->|HTTP + JSON| API["FastAPI (Python)<br/>sign-in · role checks · validation · business rules"]
+    API --> ORM["SQLAlchemy<br/>transactions"]
+    ORM --> DB[("PostgreSQL<br/>17 tables · keys · constraints")]
+    Mig["Alembic migrations 0001–0008"] --> DB
 ```
 
-The browser application has no build step; FastAPI serves it. Writes run in transactions, and row locks with version columns stop two requests from claiming the same Staff time or accommodation place. See [architecture and source map](docs/architecture/README.md) and [database](docs/database/README.md).
+The browser application has no build step; FastAPI serves it and answers its API calls. Every rule is checked on the server, so hiding a button is never the only protection. Writes run in transactions, with row locks and version numbers, so two requests cannot claim the same groomer time or Boarding place. [Architecture and source map](docs/architecture/README.md)
+
+## Data model
+
+PetOps uses a relational PostgreSQL database with **17 application tables**, versioned with Alembic (head `0008`).
+
+- **Hub:** `bookings` connects to the Customer, their pet and the service.
+- **Records linked to each booking:** Staff responsibility periods, booking events (history), Grooming records, Boarding allocations and stays, stay notes and notifications.
+- **Protection:** foreign keys (`ON DELETE RESTRICT`, except sessions) and database constraints keep these links valid, so a linked record cannot be deleted while others depend on it.
+
+High-level overview and design decisions: [database](docs/database/README.md).
+
+## Access and privacy
+
+- **Sign-in:** passwords are stored as hashes, and sessions are kept on the server and expire.
+- **Role checks:** every request is checked against the user's role (Customer, Staff or Admin) on the server.
+- **Ownership:** a Customer can reach only their own pets and bookings; other records appear not to exist.
+- **Responsibility:** Staff can view a booking while responsible or scheduled, and can act only while currently responsible.
+- **Minimal Customer view:** Customers receive only what they need; the Customer timeline shows "You" and "PetOps".
+
+This describes the design and its tests. It is not a security certification.
+
+## Responsive design
+
+PetOps is a **responsive web application**, not a native mobile app: the same pages adapt to the screen width. On phones, the side menu becomes a top bar and bottom tabs, and multi-column layouts stack into one column. This is done with CSS media queries; see the [architecture notes](docs/architecture/README.md#frontend-structure-appstatic).
+
+![Customer Home on desktop and phone](assets/screenshots/responsive-customer-home.jpg)
+
+![Staff My work on desktop and phone](assets/screenshots/responsive-staff-my-work.jpg)
+
+## Testing
+
+| Check | Result |
+|---|---|
+| Automated regression on PostgreSQL 18 | **433 passed, 0 failed** |
+| Browser end-to-end workflows (all three roles) | **13 of 13 passed** |
+| Independent technical review of the final build | Passed after one finding was corrected and re-checked |
+
+The tests cover:
+- sign-in and sessions;
+- role and ownership denials, including direct API calls;
+- the Grooming and Boarding lifecycles;
+- accommodation capacity, including simultaneous requests;
+- responsibility and handover;
+- notifications and reminders;
+- history;
+- Today and Insights counts matching their records.
+
+These are technical verification results, not user testing or production certification. [Testing details](docs/testing/README.md)
 
 ## Technology
 
-| Area | Technology (as used in this repository) |
+| Area | Technology |
 |---|---|
-| Backend | Python 3.12, FastAPI, Pydantic request models, Uvicorn |
-| Data | PostgreSQL 18 (with `btree_gist`), SQLAlchemy, Alembic |
-| Interface | HTML, CSS (5-file design system, responsive media queries), JavaScript ES modules (no framework, no bundler) |
-| Testing | Pytest against a disposable PostgreSQL database; Node.js frontend harness (`tests/ui_revamp.mjs`) |
+| Backend | Python, FastAPI, SQLAlchemy, Alembic |
+| Database | PostgreSQL |
+| Frontend | HTML, CSS, JavaScript (ES modules, no framework) |
+| Communication | REST-style HTTP APIs with JSON |
+| Verification | pytest, Node.js frontend checks, Playwright browser workflows |
 | Version control | Git, GitHub |
-
-Exact Python packages: [requirements.lock.txt](requirements.lock.txt).
 
 ## Run it locally
 
-See [Local setup](docs/developer/SETUP.md): Python virtual environment, your own new local PostgreSQL databases, private configuration (only placeholder values are in `.env.example`), migrations, starting Uvicorn, the guarded fictional demo fixture and how to run the tests. Fictional demo accounts are listed in the [walkthrough](demo/README.md).
+See [local setup](docs/developer/SETUP.md): a Python virtual environment, your own local PostgreSQL databases, private configuration (only placeholders are in `.env.example`), migrations, starting the server, and running the tests. Fictional demo accounts and a short walkthrough are in [demo](demo/README.md).
 
-## Limitations
+## Scope and limitations
 
-- **Environment:** academic prototype, run locally with fictional data. No production deployment, security certification, formal accessibility certification or broad cross-browser certification.
-- **Human evaluation:** none on this final redesigned interface. Earlier qualitative feedback was on a previous version, with no counts or scores.
+**Limitations**
+- **Environment:** academic prototype, run locally with fictional data. It is not deployed or security-certified.
+- **Not evaluated or certified:** the final interface was not formally evaluated with users, and there is no formal accessibility or cross-browser certification. Earlier user feedback shaped its design.
 - **Notifications:** in-system only.
-- **Scheduling and operations gaps:** no active Grooming handover, no transfer of an occupied Boarding unit, no opening-hours model (so no suggested time slots), no historical occupancy reconstruction, and no leave or attendance model.
+- **Not supported:** active Grooming handover, moving an occupied Boarding unit, opening hours or suggested time slots, past-occupancy reports, and Staff leave or attendance.
 
-Full list: [docs/testing/LIMITATIONS.md](docs/testing/LIMITATIONS.md).
+Full list: [limitations](docs/testing/LIMITATIONS.md).
 
-**Out of scope:** payment/POS, commission, inventory, payroll, WhatsApp/SMS or other external messaging, a native mobile app, multi-branch, multi-tenant SaaS, an AI chatbot and commercialisation features.
+**Out of scope:** payment/POS, commission, inventory, payroll, WhatsApp/SMS, a native mobile app, multi-branch, multi-tenant SaaS, an AI chatbot and commercialisation features.
 
-## Notes
+## What this project demonstrates
 
-AI tools assisted implementation, debugging and documentation; I reviewed, tested and can explain the design decisions. Private academic, interview, consent and internal audit material is not in this repository.
+Working through PetOps involved:
+
+- **Requirements analysis:** interviewing the business, mapping the current (AS-IS) process and designing the new (TO-BE) one.
+- **Role and permission modelling** for three roles, with ownership and responsibility rules.
+- **Business-rule definition:** when a booking can be confirmed, changed or cancelled, and how capacity and handover work.
+- **Workflow and data modelling:** swimlanes, sequence and status diagrams, and a 17-table relational schema with integrity constraints.
+- **API-based system thinking:** a browser frontend, a JSON API and server-side validation.
+- **Testing and traceability:** linking rules to automated tests, and checking access boundaries as well as normal paths.
+- **Scope control:** deciding what not to build, and documenting limitations honestly.
+
+AI tools assisted the implementation, debugging and documentation. I reviewed and tested the work, and I can explain its design decisions. This is an academic project, not professional or production experience.
+
+## Academic context
+
+Final Year Project 1, Bachelor in Information Systems (Business Analytics), UNITEN, 2026. The case study was RS Pet House. Interview material, the academic report and the internal review records are private and not included here. [Release identity](docs/RELEASE.md) maps this public repository to the frozen build that was tested.
 
 ## License
 
-[MIT](LICENSE), copyright (c) 2026 Ahmad Sahil Nair. Third-party dependencies keep their own licenses. See [licensing scope](LICENSING.md).
+[MIT](LICENSE), copyright (c) 2026 Ahmad Sahil Nair. Third-party dependencies keep their own licences. See [licensing scope](LICENSING.md).
