@@ -1,9 +1,9 @@
-# Interface gallery (final frozen build)
+# Interface gallery (corrected frozen build)
 
-Ten desktop captures and two desktop-and-phone comparisons of the final 18 November 2026 interface, using **fictional demonstration data**.
+Ten desktop captures and two desktop-and-phone comparisons of the corrected 25 November 2026 interface, using **fictional demonstration data**.
 
-- **Source:** the frozen-build screenshot set, cropped and placed side by side only (no retouching). No interface was changed to produce them.
-- **Content:** counts and dates reflect the moment of capture; they are not business results or usability measurements.
+- **Source:** the corrected-build screenshot set (1440 px desktop, 375 px phone), cropped and placed side by side only (no retouching). No interface was changed to produce them.
+- **Content:** counts, dates and times reflect the moment the fictional data was prepared and captured. They are not business results or usability measurements.
 - **Privacy:** no login credentials, real people, real business data or browser chrome appear.
 
 ## Customer
@@ -20,10 +20,10 @@ Ten desktop captures and two desktop-and-phone comparisons of the final 18 Novem
 ![Admin Today operations centre](screenshots/admin-today.jpg)
 ![Admin review of a Boarding request with checklist and choices](screenshots/admin-booking-review.jpg)
 ![Boarding lodging board by unit and night](screenshots/admin-lodging-board.jpg)
-![Admin Insights for a selected period](screenshots/admin-insights.jpg)
+![Admin Insights: four period measures, requests trend and completed services by type](screenshots/admin-insights.jpg)
 
 ## Responsive layout (1440 px desktop and 375 px phone)
 ![Customer Home on desktop and phone](screenshots/responsive-customer-home.jpg)
 ![Staff My work on desktop and phone](screenshots/responsive-staff-my-work.jpg)
 
-Tall pages show their upper part only.
+Tall pages show their upper part only (Insights is shown in full).

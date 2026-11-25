@@ -129,6 +129,12 @@ if (only === 'all' || only === 'queue') {
   assert.deepEqual(presetRange('month', '2026-11-18'), ['2026-11-01', '2026-11-18']);
   ok('insight periods');
 
+  // Supervisor corrections (Nov 2026): the changed pages still load as modules. Their rendered behaviour (no Admin
+  // password field when editing Staff, Staff-only password form, four Insights tiles) is covered in a real browser by
+  // .local/corrections_staff_password_e2e.cjs and the capture/E2E runs recorded in docs/evidence/corrections-2026-11/.
+  for (const p of ['shared/account.js', 'admin/settings.js', 'admin/insights.js']) assert.equal(typeof (await mod(p)).render, 'function', p);
+  ok('corrected pages load');
+
   const { friendly } = await mod('core/api.js');
   assert.match(friendly(409, 'No active available Staff without a conflicting assignment for the full Grooming duration'), /No groomer is free/);
   assert.equal(friendly(404, 'Permitted Grooming booking not found'), 'This record is not available to you, or it no longer exists.');

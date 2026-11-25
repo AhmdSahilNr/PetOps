@@ -39,7 +39,8 @@ export async function render(root, ctx) {
     const days = board.units.length ? board.units[0].nights.map((n) => n.date) : Array.from({ length: board.nights }, (_, i) => addDays(board.start, i));
     const unitCol = window.innerWidth < 768 ? 140 : 210;
     // Columns share the width (no empty trailing space) but never shrink below a readable night.
-    const template = `${unitCol}px repeat(${days.length}, minmax(52px, 1fr))`;
+    // 76px minimum (was 52px; supervisor readability correction): a one-night bar can show the pet's name.
+    const template = `${unitCol}px repeat(${days.length}, minmax(76px, 1fr))`;
     const row = (cls, ...cells) => { const r = h('div', { class: ['board__row', cls], role: 'row' }, cells); r.style.setProperty('display', 'grid'); r.style.setProperty('grid-template-columns', template); return r; };
     const dayClass = (d) => { const wd = fmtWeekday(d); return [d === today && 'is-today', (wd === 'Sat' || wd === 'Sun') && 'is-weekend']; };
     const month = new Intl.DateTimeFormat('en-MY', { timeZone: 'Asia/Kuala_Lumpur', month: 'long', year: 'numeric' }).format(new Date(`${board.start}T00:00:00+08:00`));
@@ -73,6 +74,7 @@ export async function render(root, ctx) {
             href: href(workspacePath(s)), title: `${s.pet_name}: ${scheduleText(s)}`, 'aria-label': `${s.pet_name}, ${s.service_name}, ${scheduleText(s)}, ${here ? 'in care' : s.status === 'SUBMITTED' ? 'requested' : 'confirmed'}` },
           icon(s.flags.includes('past_planned_checkout') ? 'alert' : here ? 'home_care' : s.status === 'SUBMITTED' ? 'clock' : 'bed'),
           h('span', { class: 'board__bar-text' }, `${s.starts_on < board.start ? '\u2190 ' : ''}${s.pet_name}${s.flags.includes('past_planned_checkout') ? ', overdue' : ''}`));
+          if (to - from === 1) bar.classList.add('board__bar--short'); // one night: drop the icon so the name fits
           bar.style.setProperty('grid-column', `${from + 2} / ${to + 2}`);
           bar.style.setProperty('grid-row', '1');
           r.appendChild(bar);

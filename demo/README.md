@@ -36,8 +36,8 @@ The helper also creates Staff Aisyah Rahman/Amir Hakim and Customers Mei Ling/Ar
 |1:10–1:50|Admin Today → Needs decision → open a request → review checklist → choose a groomer, or accommodation plus optional Staff → one Confirm action (or reject). Eligibility is PetOps workload and capacity, not attendance.|
 |1:50–2:30|Staff My work → one next action per job → open a Boarding job (stay progress, stay updates, responsibility). A scheduled future assignee can view the job but can't act early.|
 |2:30–3:10|Boarding lodging board and booking history. Explain Check in → Staying → Check out → Completed, the handover record, and the Overdue stay label (display only). Don't fake elapsed care.|
-|3:10–4:00|Admin Insights: selected period compared with the previous one; requests by creation date, decision rate, completions, current occupancy, team workload. Each tile opens its records.|
-|4:00–4:30|Verification: 433/0 PostgreSQL regression, 13/13 end-to-end, and the independent review that passed after one corrected finding. State the limits: no human evaluation of this interface, no production or security certification.|
+|3:10–4:00|Admin Insights: selected period compared with the previous one; four tiles (booking requests, completed services, decision rate, cancellations), the requests trend and completed services by type, with secondary figures under More detail. Each tile opens its records. Optionally show a Staff Profile's password section (only on your own disposable fixture; changing it changes that demo login).|
+|4:00–4:30|Verification: 446/0 PostgreSQL regression, 13/13 end-to-end, 7/7 Staff password checks, and the independent review that passed. State the limits: no human evaluation of this interface, no forgotten-password recovery, no production or security certification.|
 
 Use separate browser sessions if showing roles side by side, or log out before changing roles. Counts change if you perform real actions; never claim a stale screenshot is a live query. Older fixture dates need deliberate regeneration of your own disposable fixture for a later day.
 

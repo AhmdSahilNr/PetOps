@@ -63,10 +63,10 @@ def update_staff(staff_id:UUID,payload:StaffUpdateIn,user=Depends(admin),db=Depe
     old=staff_view(u)
     if 'display_name' in payload.model_fields_set:u.display_name=payload.display_name
     u.email=normalize_email(str(payload.email));u.is_active=payload.is_active
-    if payload.password is not None:u.password_hash=hash_password(payload.password)
-    if not u.is_active or payload.password is not None:
+    # Admin cannot change an existing Staff password (supervisor correction, Option A strict); Staff use PUT /account/password.
+    if not u.is_active:
         db.execute(delete(UserSession).where(UserSession.user_id==u.id))
-    db.flush();audit(db,user,'STAFF_UPDATED',{'old':old,'new':staff_view(u),'password_changed':payload.password is not None},staff_user_id=u.id)
+    db.flush();audit(db,user,'STAFF_UPDATED',{'old':old,'new':staff_view(u)},staff_user_id=u.id)
     db.commit();return staff_view(u)
 
 

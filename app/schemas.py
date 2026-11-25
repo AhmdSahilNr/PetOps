@@ -89,10 +89,23 @@ class StaffCreateIn(InputModel):
 
 
 class StaffUpdateIn(InputModel):
+    # Supervisor correction (Nov 2026): Admin cannot change an existing Staff password. With extra="forbid",
+    # a request that still sends "password" is rejected (422) instead of being silently ignored.
     display_name: Name | None = None
     email: EmailStr
     is_active: bool
-    password: str | None = Field(default=None, min_length=10, max_length=128)
+
+
+class PasswordChangeIn(InputModel):
+    """A signed-in Staff member changing their own password."""
+    current_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=10, max_length=128)
+
+    @model_validator(mode="after")
+    def new_password_differs(self):
+        if self.new_password == self.current_password:
+            raise ValueError("New password must be different from the current password")
+        return self
 
 
 class ServiceCreateIn(InputModel):

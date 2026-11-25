@@ -16,7 +16,7 @@ from sqlalchemy.orm.exc import StaleDataError
 
 from .database import get_db
 from .models import Booking, BookingEvent, BookingStatus, Customer, Pet, Role, Service, User, UserSession
-from .schemas import AdminStatusIn, BookingCreateIn, LoginIn, PetIn, ProfileUpdateIn, RegisterIn, RescheduleIn
+from .schemas import AdminStatusIn, BookingCreateIn, LoginIn, PasswordChangeIn, PetIn, ProfileUpdateIn, RegisterIn, RescheduleIn
 from .security import get_current_user, hash_password, issue_session, normalize_email, require_roles, verify_password, _extract_token
 from .services import admin_change_status, cancel_booking, create_booking, customer_for_user, reschedule_booking, utc_iso
 from .resource_routes import router as resource_router, allocation_view
@@ -139,8 +139,8 @@ def register(payload: RegisterIn, db: Session = Depends(get_db)):
 
 @app.post("/auth/login")
 def login(payload: LoginIn, response: Response, db: Session = Depends(get_db)):
-    # Share the Staff-maintenance row lock: a reset committed after this login
-    # revokes its session too; an old password cannot create a later session.
+    # Share the password-change row lock (PUT /account/password): a change committed after this
+    # login revokes its session too; an old password cannot create a later session.
     user = db.scalar(select(User).where(User.email == normalize_email(str(payload.email))).with_for_update())
     if not user or not user.is_active or not verify_password(payload.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -282,6 +282,19 @@ def admin_status(booking_id: UUID, payload: AdminStatusIn, user: User = Depends(
 @app.put("/account")
 def update_own_staff_account(payload:ProfileUpdateIn,user:User=Depends(require_roles(Role.STAFF)),db:Session=Depends(get_db)):
     user.display_name=payload.display_name;db.commit();return user_view(user)
+
+@app.put("/account/password", status_code=204)
+def change_own_staff_password(payload: PasswordChangeIn, request: Request, user: User = Depends(require_roles(Role.STAFF)), db: Session = Depends(get_db)):
+    # Same row lock as /auth/login: a concurrent login with the old password either finishes first (its session
+    # is revoked below) or waits and then fails against the new hash. populate_existing re-reads the locked row.
+    locked = db.scalar(select(User).where(User.id == user.id).with_for_update().execution_options(populate_existing=True))
+    if not verify_password(payload.current_password, locked.password_hash):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    locked.password_hash = hash_password(payload.new_password)
+    current = hashlib.sha256(_extract_token(request).encode()).hexdigest()
+    db.execute(delete(UserSession).where(UserSession.user_id == locked.id, UserSession.token_hash != current))
+    db.commit()
+    return Response(status_code=204)
 
 @app.post("/pets/{pet_id}/archive")
 def archive_pet(pet_id:UUID,user:User=Depends(require_roles(Role.CUSTOMER)),db:Session=Depends(get_db)):

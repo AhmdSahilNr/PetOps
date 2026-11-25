@@ -1,7 +1,7 @@
 {
  "algorithm": "sha256 of \"path:sha256\\n\" lines in path order",
- "combined_sha256": "1fd06edf1788176a09d9c3d93c3a28413a55a006f53f6210652fd14087048e70",
- "file_count": 146,
+ "combined_sha256": "9f48bce69bfc7fbbd6b3e49e152f9cfb45d01f6e4dd539b57f632ace6770b33a",
+ "file_count": 147,
  "files": [
   {
    "path": "app/__init__.py",
@@ -35,13 +35,13 @@
   },
   {
    "path": "app/main.py",
-   "sha256": "6836a2693313e8e963fffdd847943fbef1c2b2a69122299b7c4fe71c0fa749c6",
-   "bytes": 14933
+   "sha256": "7d2eba277b941ca0854c022700572bafc6c6a96075a0a74a9363576ee4b690d3",
+   "bytes": 16002
   },
   {
    "path": "app/management.py",
-   "sha256": "c012f55185c0b99508c16ab90a77d435344db6361b37fc0ab3cb747e7f8ccd80",
-   "bytes": 12216
+   "sha256": "21fe75ce5f5b53454c5b7a9178d31510ea6c4ee6872189ef9618bff05b70bdae",
+   "bytes": 12180
   },
   {
    "path": "app/models.py",
@@ -75,8 +75,8 @@
   },
   {
    "path": "app/schemas.py",
-   "sha256": "5ec2087111e44549638e402fcd30ba4b57a90177e8047d4bd4c0377a802f5533",
-   "bytes": 5317
+   "sha256": "f14b8929dad8f68cdc395926544ee5edfc3552ba310f2a5bb66142ba3ab92417",
+   "bytes": 5908
   },
   {
    "path": "app/security.py",
@@ -95,28 +95,28 @@
   },
   {
    "path": "app/static/css/components.css",
-   "sha256": "a5ebf8dd3f3fbbbb84e383bef5e6a8323b7d4f539a7b228c15c03e6c7041850b",
-   "bytes": 18654
+   "sha256": "59dd9564db808997023fafc5e4362c88a93afc52a2786eebcb99477248482728",
+   "bytes": 18660
   },
   {
    "path": "app/static/css/layout.css",
-   "sha256": "672e8a83aee4ca7a9cfffee6be77aa49b88368611f71e49b4769e5a17b5e7e20",
-   "bytes": 10457
+   "sha256": "0eba5aa9339694d510c11e7ac0822e4971872774a4fc30aced85f88bb7791d3f",
+   "bytes": 10451
   },
   {
    "path": "app/static/css/pages.css",
-   "sha256": "7440f7cdfcca0b1e31852ae72094cfac1742aef8ce8d2360ae1d12530cf834b8",
-   "bytes": 31179
+   "sha256": "376b00a708b8bfd0cef17780226e20abea43304723d6b82384119e87e1f9e64b",
+   "bytes": 31679
   },
   {
    "path": "app/static/css/tokens.css",
-   "sha256": "24c5b4456370724df4b90e34de1385fb685d1741163cf8466572a72fd8e42386",
-   "bytes": 2891
+   "sha256": "85ed6d2d4a7dc8539690812fb9aef6aaa38093cf3395a9b8150eeb42b16e6ab7",
+   "bytes": 2990
   },
   {
    "path": "app/static/js/admin/boarding.js",
-   "sha256": "a314d0dcee2390e765b910e1f8ccd0eaf5b2d2c83e939410cea2eee3598a138d",
-   "bytes": 10504
+   "sha256": "9b31ebc6e1662e9dce20d00bbe7f3f86af28057972640da32c944203617338dc",
+   "bytes": 10728
   },
   {
    "path": "app/static/js/admin/bookings.js",
@@ -140,8 +140,8 @@
   },
   {
    "path": "app/static/js/admin/insights.js",
-   "sha256": "79216d6837190493ad3c888c280b9abcf53cae788c6080e2525493df94cb2255",
-   "bytes": 14569
+   "sha256": "a1b072f89a96b2e739a804b80139b7e65498c2fd791027549c7babccfeb3cf58",
+   "bytes": 11685
   },
   {
    "path": "app/static/js/admin/more.js",
@@ -155,8 +155,8 @@
   },
   {
    "path": "app/static/js/admin/settings.js",
-   "sha256": "2cef7712ce61850905c967d3b2913fc91b6b05a2a5bc2bf2b0f04379e6bdc616",
-   "bytes": 17937
+   "sha256": "aa25305ee9be1106e6803a20d5c3f2d6bdf3b238286e763a71e1a20117cc7e4b",
+   "bytes": 18358
   },
   {
    "path": "app/static/js/admin/staff-work.js",
@@ -275,8 +275,8 @@
   },
   {
    "path": "app/static/js/shared/account.js",
-   "sha256": "d19232f4e6ca2194e0a87a3a45480a641fc80a21379204528b710a52bbabfa86",
-   "bytes": 2517
+   "sha256": "854f59afe0ea7d615518eea674b6ffa675d192a111c568e43787feef9d071503",
+   "bytes": 5520
   },
   {
    "path": "app/static/js/shared/auth.js",
@@ -370,8 +370,8 @@
   },
   {
    "path": "tests/test_final_hardening.py",
-   "sha256": "5e9a6aee6ded046bf8bff636abd6329a00d0b68a301e1a310e0702dece9aec38",
-   "bytes": 10549
+   "sha256": "de253b9eb5433805a99c83245a5c0e10ae4ebc8e1efe388125e5c43de089164e",
+   "bytes": 10952
   },
   {
    "path": "tests/test_final_ui.py",
@@ -410,8 +410,13 @@
   },
   {
    "path": "tests/test_slice5.py",
-   "sha256": "3b523b485192a8be0d381c1d3f8d4e778b9c4e40a68aa710b5040a61a6a12c9e",
-   "bytes": 26371
+   "sha256": "8082928cd06513f32c1188b3599ed0c476eb6406f0be75e14ca3403959b1f458",
+   "bytes": 26822
+  },
+  {
+   "path": "tests/test_supervisor_corrections_2026_11.py",
+   "sha256": "58ab056d1a00004d4230415c3a28758a2b4e5f190fa526a2aebce98a5c6ab622",
+   "bytes": 7493
   },
   {
    "path": "tests/test_vertical_slice.py",
@@ -420,8 +425,8 @@
   },
   {
    "path": "tests/ui_revamp.mjs",
-   "sha256": "8aae44e90bce4d4b33b6b65354bc374677852b88b0a6b7795777c624fc42591f",
-   "bytes": 11670
+   "sha256": "f3ddedd812a1c9efc64883518247bb4013d6252cad663a232e22299d20196215",
+   "bytes": 12198
   },
   {
    "path": "alembic/env.py",

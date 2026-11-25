@@ -243,14 +243,18 @@ def test_management_staff_create_update_revoke_and_safe_audit(case):
     c=case;new=call(c,'POST','/admin/staff',{'email':'NEW.STAFF@petops.example','password':'FictionalSecret!123'},code=201)
     assert new['email']=='new.staff@petops.example' and 'password' not in str(new)
     token=login(c['client'],new['email'],'FictionalSecret!123')
-    call(c,'PUT','/admin/staff/'+new['id'],{'email':'edited.staff@petops.example','is_active':True,'password':'ChangedSecret!123'})
-    assert c['client'].get('/me',headers=bearer(token)).status_code==401
-    token=login(c['client'],'edited.staff@petops.example','ChangedSecret!123')
+    # Supervisor correction (Option A, strict): Admin cannot change an existing Staff password.
+    r=c['client'].put('/admin/staff/'+new['id'],headers=c['admin'],json={'email':'edited.staff@petops.example','is_active':True,'password':'ChangedSecret!123'})
+    assert r.status_code==422 and 'ChangedSecret' not in r.text
+    call(c,'PUT','/admin/staff/'+new['id'],{'email':'edited.staff@petops.example','is_active':True})
+    assert c['client'].get('/me',headers=bearer(token)).status_code==200
+    token=login(c['client'],'edited.staff@petops.example','FictionalSecret!123')
+    assert c['client'].post('/auth/login',json={'email':'edited.staff@petops.example','password':'ChangedSecret!123'}).status_code==401
     call(c,'PUT','/admin/staff/'+new['id'],{'email':'edited.staff@petops.example','is_active':False})
     assert c['client'].get('/me',headers=bearer(token)).status_code==401
     audit=call(c,'GET','/admin/management-history');assert len(audit)==3
     assert all(e['actor_user_id']==str(c['seed']['admin'].id) for e in audit)
-    assert not any(x in str(audit) for x in ('FictionalSecret','ChangedSecret','password_hash'))
+    assert not any(x in str(audit) for x in ('FictionalSecret','ChangedSecret','password_hash','password_changed'))
 
 
 def test_staff_account_maintenance_rejects_wrong_role_duplicate_and_active_work(case):

@@ -84,16 +84,21 @@ async function staff(ctx) {
     const isNew = !s;
     const name = input({ value: s ? s.display_name || '' : '', maxLength: 120, autocomplete: 'off' });
     const email = input({ type: 'email', value: s ? s.email : '', required: true, autocomplete: 'off' });
-    const pw = input({ type: 'password', minLength: 10, maxLength: 128, autocomplete: 'new-password' });
+    // Supervisor correction (Nov 2026): Admin sets a temporary password only when creating an account.
+    // An existing team member's password is private: they change it themselves from their Profile.
+    const pw = isNew ? input({ type: 'password', minLength: 10, maxLength: 128, autocomplete: 'new-password', required: true }) : null;
     const active = h('input', { type: 'checkbox', checked: s ? s.is_active : true });
     const legacy = h('div');
     if (s) get(`/admin/staff/${s.id}/availability`).then((w) => { if (w.length) replace(legacy, notice('info', 'Legacy availability records', `${plural(w.length, 'older availability window')} recorded before 14 Nov ${w.length === 1 ? 'is' : 'are'} kept read-only. They no longer affect assignment.`)); }).catch(() => {});
+    const credentials = isNew
+      ? field({ label: 'Temporary password', input: pw, hint: 'At least 10 characters. Share it privately; the team member should change it from their Profile after signing in.' })
+      : notice('info', 'Password', 'Only the team member can change their own password, from their Profile. A forgotten password cannot be reset in this version of PetOps.');
     formDrawer(isNew ? 'Add team member' : `Edit ${s.display_name || s.email}`, [field({ label: 'Display name', input: name, hint: 'Shown on assignments and history.' }),
-      field({ label: 'Sign-in email', input: email }), field({ label: isNew ? 'Temporary password' : 'New password (optional)', input: pw, hint: 'At least 10 characters. Changing it signs the person out.' }),
+      field({ label: 'Sign-in email', input: email }), credentials,
       h('label', { class: 'check' }, active, 'Active (can sign in and be assigned)')], isNew ? 'Add team member' : 'Save changes', async () => {
       if (!email.value.includes('@')) throw new Error('Enter a valid email address.');
-      if ((isNew || pw.value) && pw.value.length < 10) throw new Error('Passwords need at least 10 characters.');
-      const payload = { display_name: name.value.trim() || null, email: email.value.trim(), is_active: active.checked, ...(pw.value ? { password: pw.value } : {}) };
+      if (isNew && pw.value.length < 10) throw new Error('Passwords need at least 10 characters.');
+      const payload = { display_name: name.value.trim() || null, email: email.value.trim(), is_active: active.checked };
       if (s && s.is_active && !active.checked && !(await confirmDialog({ title: `Deactivate ${s.display_name || s.email}?`, confirmLabel: 'Deactivate', cancelLabel: 'Keep active', danger: true,
         body: 'They will be signed out and cannot be assigned. PetOps refuses this while they still have current or upcoming work; reassign it first.' }))) return undefined;
       if (isNew) await post('/admin/staff', { ...payload, password: pw.value }); else await put(`/admin/staff/${s.id}`, payload);

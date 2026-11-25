@@ -45,6 +45,7 @@ Requested → Admin allocates accommodation with a free place every night (Staff
 
 - **Daily work:** review and decide requests, prepare resources, follow Today, the Boarding lodging board, Staff work and History.
 - **Settings:** maintain Services, Staff accounts and Boarding setup (units and capacity). Configure Reminders, and review the Change log.
+- **Staff passwords:** Admin sets a temporary password when creating a Staff account and cannot change it afterwards. The Staff member changes their own password from Profile after confirming the current one; their other sessions are signed out. Forgotten-password recovery is not provided in FYP1.
 - **Staff deactivation:** refused while that person still has current or upcoming work.
 - **History is kept:** inactive services and archived pets remain in history but can't be chosen for new requests.
 

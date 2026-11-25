@@ -17,10 +17,11 @@ PetOps connects everything a small pet-care business needs to run Grooming appoi
 | **Customer booking journey** | Five steps (type, pet, service, date and time, review), with an availability check. The request is confirmed by Admin, not automatically |
 | **Admin operations** | A Today view of what needs a decision, a review workspace, a Boarding lodging board of capacity per night, Staff workload and period Insights |
 | **Staff work** | Each Staff member sees only the jobs they are responsible for, with one clear next action per job |
+| **Password ownership** | Admin sets a Staff member's initial password only; each Staff member changes their own after confirming the current one, and their other sessions are signed out |
 | **Boarding capacity** | Accommodation is allocated against a limit on every night of a stay and released at check-out |
 | **Responsibility and handover** | Staff accountability is recorded over time, and access follows it, including handover during a stay |
 | **History** | Each booking action is recorded as an event with who did it and when; past responsibility periods stay on record |
-| **Verified** | 433 automated PostgreSQL tests passed (0 failed); 13 of 13 browser workflows passed; independent technical review closed |
+| **Verified** | 446 automated PostgreSQL tests passed (0 failed); 13 of 13 browser workflows and 7 of 7 Staff password checks passed; independent technical review passed |
 
 ## The problem
 
@@ -48,7 +49,7 @@ flowchart LR
 
 ## What it looks like
 
-All screenshots show the final interface with **fictional data**.
+All screenshots show the final corrected interface (25 November 2026) with **fictional data**.
 
 **Customer**
 
@@ -72,7 +73,7 @@ All screenshots show the final interface with **fictional data**.
 |---|---|
 | ![Admin Today](assets/screenshots/admin-today.jpg) | ![Admin booking review](assets/screenshots/admin-booking-review.jpg) |
 
-| Boarding lodging board: places per unit and night | Insights: a selected period, with drill-down |
+| Boarding lodging board: places per unit and night | Insights: four period measures, a trend and completed services, with drill-down |
 |---|---|
 | ![Lodging board](assets/screenshots/admin-lodging-board.jpg) | ![Insights](assets/screenshots/admin-insights.jpg) |
 
@@ -81,8 +82,8 @@ All screenshots show the final interface with **fictional data**.
 | Role | What they do | What they cannot do |
 |---|---|---|
 | **Customer** | Register, manage pets, book Grooming or Boarding, follow progress, change dates or cancel before work starts, read notifications | See anyone else's data; choose the accommodation unit |
-| **Staff** | See their own work and agenda; start and complete Grooming; check in, add stay updates, check out | Confirm bookings, allocate resources or change settings; open work no longer assigned to them |
-| **Admin** | Review and confirm or reject, assign groomers, allocate accommodation, hand over responsibility, monitor Today and Insights, manage services, Staff accounts, units and reminders | Create bookings for Customers |
+| **Staff** | See their own work and agenda; start and complete Grooming; check in, add stay updates, check out; change their own password | Confirm bookings, allocate resources or change settings; open work no longer assigned to them |
+| **Admin** | Review and confirm or reject, assign groomers, allocate accommodation, hand over responsibility, monitor Today and Insights, manage services, Staff accounts (with an initial password), units and reminders | Create bookings for Customers; change an existing Staff member's password |
 
 ## How the system works
 
@@ -136,6 +137,7 @@ High-level overview and design decisions: [database](docs/database/README.md).
 ## Access and privacy
 
 - **Sign-in:** passwords are stored as hashes, and sessions are kept on the server and expire.
+- **Password ownership:** Admin cannot change an existing Staff password; the server rejects a password sent with a Staff edit. A Staff member changes their own after confirming the current one (10–128 characters, must differ), and their other sessions are signed out.
 - **Role checks:** every request is checked against the user's role (Customer, Staff or Admin) on the server.
 - **Ownership:** a Customer can reach only their own pets and bookings; other records appear not to exist.
 - **Responsibility:** Staff can view a booking while responsible or scheduled, and can act only while currently responsible.
@@ -155,12 +157,13 @@ PetOps is a **responsive web application**, not a native mobile app: the same pa
 
 | Check | Result |
 |---|---|
-| Automated regression on PostgreSQL 18 | **433 passed, 0 failed** |
+| Automated regression on PostgreSQL 18 | **446 passed, 0 failed** |
 | Browser end-to-end workflows (all three roles) | **13 of 13 passed** |
-| Independent technical review of the final build | Passed after one finding was corrected and re-checked |
+| Staff password browser checks | **7 of 7 passed** |
+| Independent technical review of the corrected build | Passed after its evidence-handling conditions were closed |
 
 The tests cover:
-- sign-in and sessions;
+- sign-in and sessions, including password ownership and self-service change;
 - role and ownership denials, including direct API calls;
 - the Grooming and Boarding lifecycles;
 - accommodation capacity, including simultaneous requests;
@@ -192,6 +195,7 @@ See [local setup](docs/developer/SETUP.md): a Python virtual environment, your o
 - **Environment:** academic prototype, run locally with fictional data. It is not deployed or security-certified.
 - **Not evaluated or certified:** the final interface was not formally evaluated with users, and there is no formal accessibility or cross-browser certification. Earlier user feedback shaped its design.
 - **Notifications:** in-system only.
+- **Passwords:** there is no forgotten-password recovery yet (planned for Project 2), no self-service change for Customers or Admin, and no limit on repeated password attempts.
 - **Not supported:** active Grooming handover, moving an occupied Boarding unit, opening hours or suggested time slots, past-occupancy reports, and Staff leave or attendance.
 
 Full list: [limitations](docs/testing/LIMITATIONS.md).

@@ -17,6 +17,7 @@ flowchart TD
 |---|---|
 | App entry, sign-in/logout, Customer API, page shell and caching | [main.py](../../app/main.py), [templates/index.html](../../app/templates/index.html) |
 | Password hashing, sessions, `require_roles` | [security.py](../../app/security.py) |
+| Staff self-service password change (`PUT /account/password`): current-password check, other sessions signed out | [main.py](../../app/main.py), [shared/account.js](../../app/static/js/shared/account.js) |
 | Request validation | [schemas.py](../../app/schemas.py) |
 | Booking transitions, events, reschedule and cancel | [services.py](../../app/services.py) |
 | Staff eligibility, Grooming time and Boarding capacity checks | [availability.py](../../app/availability.py), [resource_routes.py](../../app/resource_routes.py) |
@@ -27,7 +28,7 @@ flowchart TD
 | Admin Today, lodging board, overdue-stay rule | [operations.py](../../app/operations.py) |
 | Insights periods, trends and drill-down records | [dashboard.py](../../app/dashboard.py) |
 | Notifications and reminders | [notifications.py](../../app/notifications.py) |
-| Admin accounts, services and change log | [management.py](../../app/management.py) |
+| Admin accounts (initial Staff password on creation only), services and change log | [management.py](../../app/management.py) |
 | Models and migrations | [models.py](../../app/models.py), [alembic/versions](../../alembic/versions) |
 
 ## Frontend structure (`app/static`)

@@ -16,14 +16,15 @@ All dates use Malaysia time. Each count and its drill-down list come from **one 
 
 ## Insights (selected period)
 
-| Measure | Definition | Limitation |
-|---|---|---|
-| Booking requests | Bookings **created** in the period | Not service dates or demand forecasts |
-| Completed services | Grooming/Boarding **completion times** in the period | Not revenue |
-| Decision rate | Confirmations ÷ (confirmations + rejections) in the period; "—" when there were none | A reconfirmed booking can add another decision |
-| Cancellations / date changes | Recorded change **events** in the period | Not satisfaction or churn |
-| In care now | Current snapshot of staying pets against capacity | Past occupancy is not reconstructed |
-| Team workload | Open responsibility now and in the next 7 days, counted as distinct bookings | Not hours worked or performance |
+Since the 25 November 2026 corrections, Insights is a simplified period review: four main tiles, a booking-requests trend, completed services by service type, and a **More detail** section. Current occupancy and team workload are no longer repeated here. They are shown on Today (In care now, Staff work), on the lodging board and on the Staff work page. The reporting definitions and drill-down records are unchanged.
+
+| Measure | Where | Definition | Limitation |
+|---|---|---|---|
+| Booking requests | Tile and trend chart | Bookings **created** in the period | Not service dates or demand forecasts |
+| Completed services | Tile, and completed services by service type | Grooming/Boarding **completion times** in the period | Not revenue |
+| Decision rate | Tile | Confirmations ÷ (confirmations + rejections) in the period; "—" when there were none | A reconfirmed booking can add another decision |
+| Cancellations | Tile | Recorded cancellation **events** in the period | Not satisfaction or churn |
+| Confirmations, rejections, date changes | More detail | Recorded decision and change **events** in the period | As above |
 
 - **Periods:** presets or custom, up to 731 days.
 - **Trends:** zero-filled by day, week or month.

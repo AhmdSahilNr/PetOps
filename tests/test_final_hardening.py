@@ -41,8 +41,11 @@ def test_unrepresentable_utc_other_surfaces_fail_closed(case,surface):
 
 
 def test_password_reset_cannot_leave_concurrent_old_password_login_valid(case,monkeypatch):
+    # Retargeted (supervisor correction, Nov 2026): Admin resets were removed, so the same guarantee is now
+    # proved for the Staff member's own password change (PUT /account/password), which shares the login row lock.
     import app.main as main
     c=case;verified=Event();release=Event();original=main.issue_session;staff=c['seed']['staff2']
+    own=login(c['client'],staff.email,'DemoPass!123')
     def paused(db,user):
         if user.id==staff.id:
             verified.set();assert release.wait(12),'Test synchronization timed out'
@@ -51,7 +54,7 @@ def test_password_reset_cannot_leave_concurrent_old_password_login_valid(case,mo
     def authenticate():
         with TestClient(app) as client:return client.post('/auth/login',json={'email':staff.email,'password':'DemoPass!123'})
     def reset():
-        with TestClient(app) as client:return client.put('/admin/staff/'+str(staff.id),headers=c['admin'],json={'email':staff.email,'is_active':True,'password':'FinalReset!123'})
+        with TestClient(app) as client:return client.put('/account/password',headers=bearer(own),json={'current_password':'DemoPass!123','new_password':'FinalReset!123'})
     with ThreadPoolExecutor(2) as pool:
         pending=pool.submit(authenticate);assert verified.wait(8)
         resetting=pool.submit(reset)
@@ -68,10 +71,11 @@ def test_password_reset_cannot_leave_concurrent_old_password_login_valid(case,mo
             assert observed,'Neither reset completion nor database lock wait observed'
         finally:release.set()
         auth=pending.result(timeout=10);changed=resetting.result(timeout=10)
-    assert auth.status_code==changed.status_code==200
+    assert auth.status_code==200 and changed.status_code==204
     token=auth.json()['token']
     authenticated=c['client'].get('/me',headers=bearer(token))
     assert authenticated.status_code==401
+    assert c['client'].get('/me',headers=bearer(own)).status_code==200  # the session that made the change stays signed in
     assert c['client'].post('/auth/login',json={'email':staff.email,'password':'DemoPass!123'}).status_code==401
     fresh=login(c['client'],staff.email,'FinalReset!123')
     assert c['client'].get('/me',headers=bearer(fresh)).status_code==200

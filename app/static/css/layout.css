@@ -40,7 +40,7 @@
   .nav-group { width: 100%; justify-items: center; border-top: 1px solid rgba(255,255,255,.08); padding-top: var(--s3); }
   .nav-item { width: 48px; justify-content: center; padding: 0; }
   .nav-item[aria-current="page"]::before { left: -8px; }
-  .nav-badge { position: absolute; top: 2px; right: 0; min-width: 18px; height: 16px; line-height: 16px; font-size: .6875rem; }
+  .nav-badge { position: absolute; top: 2px; right: 0; min-width: 18px; height: 16px; line-height: 16px; font-size: .75rem; }
   .ws__who { flex-direction: column; padding: var(--s3) 0 0; }
   .ws__who .btn--ghost { margin: 0; }
   .ws__content { padding: var(--s6) var(--s6) var(--s9); }
@@ -62,11 +62,11 @@
 .tabbar { display: none; }
 @media (max-width: 767px) {
   .tabbar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; height: var(--bottombar); padding-bottom: env(safe-area-inset-bottom); background: var(--surface); border-top: 1px solid var(--line); }
-  .tabbar a, .tabbar button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); text-decoration: none; font-size: .6875rem; font-weight: 600; background: none; border: 0; cursor: pointer; }
+  .tabbar a, .tabbar button { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--muted); text-decoration: none; font-size: .8125rem; font-weight: 600; background: none; border: 0; cursor: pointer; }
   .tabbar svg { width: 22px; height: 22px; }
   .tabbar [aria-current="page"] { color: var(--primary); }
   .tabbar [aria-current="page"]::before { content: ""; position: absolute; top: 0; left: 30%; right: 30%; height: 3px; border-radius: 0 0 3px 3px; background: var(--brand); }
-  .tabbar .nav-badge { position: absolute; top: 6px; left: calc(50% + 6px); min-width: 18px; height: 16px; line-height: 16px; font-size: .6875rem; margin: 0; }
+  .tabbar .nav-badge { position: absolute; top: 6px; left: calc(50% + 6px); min-width: 18px; height: 16px; line-height: 16px; font-size: .75rem; margin: 0; }
 }
 
 /* ---------- Customer portal shell ---------- */
@@ -93,7 +93,7 @@
 .icon-link { position: relative; display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: var(--r-sm); color: var(--ink-2); }
 .icon-link:hover { background: var(--canvas); color: var(--ink); }
 .icon-link svg { width: 22px; height: 22px; }
-.icon-link .nav-badge { position: absolute; top: 2px; right: 0; margin: 0; min-width: 18px; height: 16px; line-height: 16px; font-size: .6875rem; }
+.icon-link .nav-badge { position: absolute; top: 2px; right: 0; margin: 0; min-width: 18px; height: 16px; line-height: 16px; font-size: .75rem; }
 .portal__main { flex: 1; width: 100%; max-width: var(--customer-max); margin: 0 auto; padding: var(--s7) var(--s6) var(--s9); }
 .portal__foot { border-top: 1px solid var(--line); padding: var(--s5) var(--s6); color: var(--muted); font-size: var(--fs-tiny); text-align: center; }
 @media (max-width: 900px) { .portal__links { display: none; } }
